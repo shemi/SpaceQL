@@ -21,6 +21,7 @@ class App {
         this.ipc.on(events.CONNECT, this.connect.bind(this));
         this.service.on(events.TEST_CONNECTION, this.testConnection.bind(this));
         this.service.on(events.GET_ALL_FAVORITES, Favorite.getAllAndTransform);
+        this.service.on(events.SAVE_FAVORITE, Favorite.createUpdate);
     }
 
 

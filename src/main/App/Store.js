@@ -18,6 +18,7 @@ class Store {
         this.saveTimer = null;
         this.saving = false;
         this.data = Store._load(this.path, this.encrypted, this.cryptr);
+        console.log(this.path);
     }
 
     get(key, defaultValue = null) {

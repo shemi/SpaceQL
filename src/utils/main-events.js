@@ -5,5 +5,6 @@ export const
     EDIT = 'edit',
     ALTER = 'alter',
     CLOSE_DB_CONNECTION = 'close-db-connection',
-    GET_ALL_FAVORITES = 'Favorite/getAllAndTransform'
+    GET_ALL_FAVORITES = 'Favorite/getAllAndTransform',
+    SAVE_FAVORITE = 'Favorite/save'
 ;

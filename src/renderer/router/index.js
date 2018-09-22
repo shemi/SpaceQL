@@ -11,27 +11,32 @@ export default new Router({
             components: {
                 default: require('@/components/ConnectionForm').default,
                 aside: require('@/components/ConnectionAside').default,
-            }
+            },
+            props: {
+                default: { newFavorite: false }
+            },
         },
         {
             path: '/favorites',
-            name: 'new-favorite',
+            name: 'favorite',
             components: {
                 default: require('@/components/ConnectionForm').default,
                 aside: require('@/components/ConnectionAside').default,
             },
             props: {
-                aside: { newFavorite: true }
+                default: { newFavorite: true }
             },
-            children: [
-                {
-                    path: ':id',
-                    favorites: 'single-favorite',
-                    props: {
-                        aside: { newFavorite: false }
-                    },
-                }
-            ]
+        },
+        {
+            path: '/favorites/:id',
+            name: 'favorite-single',
+            components: {
+                default: require('@/components/ConnectionForm').default,
+                aside: require('@/components/ConnectionAside').default,
+            },
+            props: {
+                default: { newFavorite: false }
+            },
         },
         {
             path: '*',

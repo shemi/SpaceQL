@@ -13,6 +13,26 @@
         <div class="connection-form-content">
             <el-form ref="form" :model="form" label-width="120px" size="mini">
 
+                <template>
+                    <el-form-item label="Name">
+                        <el-input v-model="form.name"></el-input>
+                    </el-form-item>
+
+                    <el-form-item>
+                        <div class="color-selector">
+                            <label class="color-selector-item"
+                                   v-for="color in colors"
+                                   :title="color.name"
+                                   :key="color.color">
+                                <input type="radio" v-model="form.color" :value="color.color">
+                                <span class="color-bubble" :style="{backgroundColor: color.color}">
+                                    <i class="check-mark el-icon-check"></i>
+                                </span>
+                            </label>
+                        </div>
+                    </el-form-item>
+                </template>
+
                 <el-form-item label="DB Host" class="host-port-fields">
                     <el-col :span="16">
                         <el-input v-model="form.dbHost"></el-input>
@@ -69,13 +89,22 @@
 
         <div class="connection-form-footer">
             <el-row class="links-actions">
-                <el-button size="mini" round>Save</el-button>
+                <el-button size="mini"
+                           :loading="saving"
+                           @click="save(form)"
+                           round>Save</el-button>
                 <el-button size="mini" round
                            @click="testConnection"
                            :loading="testLoading">Test Connection</el-button>
             </el-row>
 
-            <el-button type="primary" :disabled="busy">Connect</el-button>
+            <el-button v-if="newFavorite"
+                       type="primary"
+                       :loading="saving"
+                       @click="save(form)"
+                       :disabled="busy">Save</el-button>
+
+            <el-button v-else type="primary" :disabled="busy">Connect</el-button>
         </div>
 
     </div>
@@ -88,10 +117,16 @@
         TEST_CONNECTION,
         CONNECT
     } from '../../utils/main-events';
+    import { COLORS } from "../../utils/constants";
     import service from '../Service';
+    import { createNamespacedHelpers } from 'vuex';
+
+    const { mapGetters, mapActions } = createNamespacedHelpers('Favorite');
 
     const crateConnectionForm = (data = {}) => {
-        return {
+        return Object.assign({
+            name: '',
+            color: 'black',
             connectionType: 'tcp',
             driver: 'mysql',
             dbHost: '127.0.0.1',
@@ -105,24 +140,61 @@
             sshPassword: '',
             sshKeyFilePath: '',
             socketPath: ''
-        }
+        }, data)
     };
 
     export default {
+
+        props: {
+            newFavorite: {
+                type: Boolean,
+                default: false
+            }
+        },
 
         data() {
             return {
                 form: crateConnectionForm(),
                 busy: false,
                 testLoading: false,
+                saving: false,
+                colors: COLORS
             }
         },
 
-        mounted() {
-
+        created() {
+            if(this.$route.params.id) {
+                this.form = crateConnectionForm(
+                    this.$store.getters['Favorite/getFavoriteById'](this.$route.params.id)
+                );
+            }
         },
 
         methods: {
+            ...mapActions([
+                'saveFavorite'
+            ]),
+
+            save() {
+                if(this.saving) {
+                    return;
+                }
+
+                this.saving = true;
+                this.busy = true;
+
+                this.$store.dispatch('Favorite/saveFavorite', this.form)
+                    .then(favorite => {
+                        this.saving = false;
+                        this.busy = false;
+
+                        if(this.newFavorite) {
+                            this.$router.push({name: 'favorite-single', params: {id: favorite.id}});
+                        }
+
+                    })
+
+            },
 
             testConnection() {
                 if(this.testLoading || this.busy) {
@@ -186,6 +258,16 @@
                     }
                 );
             }
+        },
+
+        computed: {
+            ...mapGetters([
+                'allFavorites',
+                'currentFavorite'
+            ]),
+
+
+
         }
 
     }
@@ -237,6 +319,47 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+
+    .color-selector {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .color-selector-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+
+            .color-bubble {
+                display: flex;
+                color: white;
+                align-items: center;
+                justify-content: center;
+                width: 20px;
+                height: 20px;
+                border-radius: 100%;
+                flex-grow: 0;
+                flex-shrink: 0;
+
+                .check-mark {
+                    opacity: 0;
+                }
+            }
+
+            input {
+                position: absolute;
+                opacity: 0;
+
+                &:checked + .color-bubble {
+                    .check-mark {
+                        opacity: 1;
+                    }
+                }
+
+            }
+
+        }
     }
 
 </style>

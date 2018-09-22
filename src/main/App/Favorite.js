@@ -9,10 +9,33 @@ class Favorite extends Model {
         return super(FAVORITES_STORE_KEY, data, id);
     }
 
-    static getAllAndTransform() {
-        let all = Favorite.all();
+    static createUpdate(form) {
+        let inst;
 
-        return all;
+        if(form.id) {
+            inst = Favorite.get(form.id)
+                .fill(form);
+        } else {
+            inst = new Favorite(form);
+
+
+        }
+
+        inst.save();
+
+        return inst.toCollection();
+    }
+
+    static getAllAndTransform() {
+        let all = Favorite.all(),
+            collection = [],
+            inst;
+
+        for (inst of all) {
+            collection.push(inst.toCollection());
+        }
+
+        return collection;
     }
 
 }

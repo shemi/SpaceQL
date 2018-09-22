@@ -1,5 +1,6 @@
 import Store from './Store';
 import uuid from 'uuid/v4';
+import set from 'lodash/set';
 
 const store = Store.instance();
 const loaded = {};
@@ -20,29 +21,6 @@ class Model {
         if(data && typeof data === 'object') {
             this._populate(data, id);
         }
-
-        return new Proxy(this, {
-            get(target, key) {
-                if(target.hasOwnProperty(key)) {
-                    return target[key];
-                }
-
-                return target.data[key];
-            },
-            set(target, key, value) {
-                if(target.hasOwnProperty(key)) {
-                    target[key] = value;
-                    target.isDerty = true;
-
-                    return true;
-                }
-
-                target.data[key] = value;
-                target.isDerty = true;
-
-                return true;
-            }
-        });
     }
 
     fill(data) {
@@ -62,6 +40,11 @@ class Model {
 
     save() {
         store.set(this._getStoreKey(), this.data);
+
+        if(! loaded[this.storeKey] || ! loaded[this.storeKey][this.id]) {
+            set(loaded, `${this.storeKey},${this.id}`, this);
+        }
+
         this.isNew = false;
         this.isDerty = false;
     }
@@ -87,7 +70,7 @@ class Model {
             return loaded[inst.storeKey][id];
         }
 
-        let data = store.get(inst.storeKey+'.'+id);
+        let data = store.get(inst._getStoreKey(id));
 
         if(! data) {
             throw new Error(`No ${inst.constructor.name} with the ID: ${id} found.`);
@@ -95,11 +78,7 @@ class Model {
 
         inst._populate(data, id);
 
-        if(! loaded[inst.storeKey]) {
-            loaded[inst.storeKey] = {};
-        }
-
-        loaded[inst.storeKey][id] = inst;
+        set(loaded, inst._getStoreKey(id), inst);
 
         return inst;
     }
@@ -127,6 +106,13 @@ class Model {
         }
 
         return instances;
+    }
+
+    toCollection() {
+        return {
+            ...this.data,
+            id: this.id,
+        };
     }
 
 }

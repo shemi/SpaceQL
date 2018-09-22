@@ -14,7 +14,7 @@
 
         <el-container class="page-main-content">
           <el-main>
-            <router-view></router-view>
+            <router-view :key="$route.fullPath"></router-view>
           </el-main>
         </el-container>
 
@@ -26,11 +26,11 @@
 </template>
 
 <script>
-  export default {
-    name: 'sonarr-pro'
-  }
+export default {
+  name: "sonarr-pro"
+};
 </script>
 
 <style>
-  /* CSS */
+/* CSS */
 </style>
