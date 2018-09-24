@@ -10,7 +10,7 @@ export default new Router({
             name: 'quick-connection',
             components: {
                 default: require('@/components/ConnectionForm').default,
-                aside: require('@/components/ConnectionAside').default,
+                aside: require('@/components/FavoritesAside').default,
             },
             props: {
                 default: { newFavorite: false }
@@ -21,7 +21,7 @@ export default new Router({
             name: 'favorite',
             components: {
                 default: require('@/components/ConnectionForm').default,
-                aside: require('@/components/ConnectionAside').default,
+                aside: require('@/components/FavoritesAside').default,
             },
             props: {
                 default: { newFavorite: true }
@@ -32,11 +32,27 @@ export default new Router({
             name: 'favorite-single',
             components: {
                 default: require('@/components/ConnectionForm').default,
-                aside: require('@/components/ConnectionAside').default,
+                aside: require('@/components/FavoritesAside').default,
             },
             props: {
                 default: { newFavorite: false }
             },
+        },
+        {
+            path: '/connection/:id',
+            name: 'connection',
+            components: {
+                default: require('@/components/EmptyView').default,
+                aside: require('@/components/ConnectionAside').default,
+            },
+            children: [
+                {
+                    path: 'table/:tableName',
+                    components: {
+                        default: require('@/components/TableExplorer').default,
+                    }
+                }
+            ]
         },
         {
             path: '*',

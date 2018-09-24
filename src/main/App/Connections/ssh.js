@@ -3,7 +3,12 @@ import { Client } from 'ssh2';
 
 class SshConnection extends Connection {
 
-    connect() {
+    async connect() {
+        return await this.connectSshPipe()
+            .connect();
+    }
+
+    connectSshPipe() {
         let dbConfig = this._addDbDefaults(this.dbConfig);
 
         return new Promise((resolve, reject) => {
@@ -26,7 +31,7 @@ class SshConnection extends Connection {
                         dbConfig.stream = stream;
                         this.driver.setConfig(dbConfig);
 
-                        resolve();
+                        resolve(this.driver);
                     }
                 )
             });
@@ -52,10 +57,8 @@ class SshConnection extends Connection {
     async test() {
         let data;
 
-        await this.connect();
-
         try {
-            data = await this.driver.test();
+            data = await this.connectSshPipe().test();
         } catch(err) {
             throw new Error(err);
         }

@@ -13,7 +13,7 @@
         <div class="connection-form-content">
             <el-form ref="form" :model="form" label-width="120px" size="mini">
 
-                <template>
+                <template v-if="isFavorite">
                     <el-form-item label="Name">
                         <el-input v-model="form.name"></el-input>
                     </el-form-item>
@@ -91,8 +91,16 @@
             <el-row class="links-actions">
                 <el-button size="mini"
                            :loading="saving"
-                           @click="save(form)"
+                           v-if="isExistsFavorite"
+                           @click="saveFavorite"
                            round>Save</el-button>
+
+                <el-button size="mini"
+                           :loading="saving"
+                           v-if="isExistsFavorite"
+                           @click="deleteFavorite"
+                           round>Delete</el-button>
+
                 <el-button size="mini" round
                            @click="testConnection"
                            :loading="testLoading">Test Connection</el-button>
@@ -101,10 +109,15 @@
             <el-button v-if="newFavorite"
                        type="primary"
                        :loading="saving"
-                       @click="save(form)"
+                       @click="saveFavorite"
                        :disabled="busy">Save</el-button>
 
-            <el-button v-else type="primary" :disabled="busy">Connect</el-button>
+            <el-button v-else
+                       type="primary"
+                       @click="connect"
+                       :disabled="busy">
+                Connect
+            </el-button>
         </div>
 
     </div>
@@ -164,9 +177,13 @@
 
         created() {
             if(this.$route.params.id) {
-                this.form = crateConnectionForm(
-                    this.$store.getters['Favorite/getFavoriteById'](this.$route.params.id)
-                );
+                let favorite = this.$store.getters['Favorite/getFavoriteById'](this.$route.params.id);
+
+                if(! favorite || ! favorite.id) {
+                    this.$router.push('/');
+                }
+
+                this.form = crateConnectionForm(favorite);
             }
         },
 
@@ -175,7 +192,16 @@
                 'saveFavorite'
             ]),
 
-            save() {
+            deleteFavorite() {
+                let id = this.id || this.$route.params.id;
+
+                if(! id) {
+                    return;
+                }
+
+            },
+
+            saveFavorite() {
                 if(this.saving) {
                     return;
                 }
@@ -191,7 +217,6 @@
                         if(this.newFavorite) {
                             this.$router.push({name: 'favorite-single', params: {id: favorite.id}});
                         }
-
                     })
 
             },
@@ -235,6 +260,27 @@
                     });
             },
 
+            connect() {
+                if(this.busy) {
+                    return;
+                }
+
+                this.busy = true;
+
+                this.$store.dispatch('Connection/connect', this.form)
+                    .then(data => {
+                        this.busy = false;
+                        this.$router.push(`/connection/${data.id}`);
+                    })
+                    .catch(err => {
+                        this.busy = false;
+
+                        this.$alert(`${err.message}`, `Connection failed`, {
+                            type: 'error',
+                        });
+                    });
+            },
+
             getFilePath(formKey, title = '', buttonLabel='Select', defaultPath = '') {
                 defaultPath = defaultPath || (this.form[formKey] || '');
 
@@ -266,7 +312,13 @@
                 'currentFavorite'
             ]),
 
+            isFavorite() {
+                return this.newFavorite || this.$route.params.id;
+            },
 
+            isExistsFavorite() {
+                return ! this.newFavorite && this.$route.params.id;
+            }
 
         }
 

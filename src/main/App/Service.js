@@ -9,7 +9,6 @@ class Service {
 
     on(route, listener) {
         this.ipc.on(route, (event, replyChannel, ...dataArgs) => {
-
             Promise.resolve().then(() => listener(...dataArgs))
                 .then((results) => {
                     event.sender.send(replyChannel, 'success', results);

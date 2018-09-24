@@ -2,28 +2,39 @@ import Connection from "./Connection";
 
 class TcpIp extends Connection {
 
-    connect() {
+    async connect() {
+        let connection;
         this.driver.setConfig(this.dbConfig);
+
+        try {
+            connection = await this.driver.connect();
+        } catch (e) {
+            throw e;
+        }
+
+        return connection;
     }
 
     disconnect() {
-
+        if(this.driver.connected) {
+            this.driver.disconnect();
+        }
     }
 
     async test() {
-        let version;
+        let data;
 
-        this.connect();
+        this.driver.setConfig(this.dbConfig);
 
         try {
-            version = await this.driver.test();
+            data = await this.driver.test();
         } catch(err) {
             throw new Error(err);
         }
 
         this.disconnect();
 
-        return version;
+        return data;
     }
 
 }

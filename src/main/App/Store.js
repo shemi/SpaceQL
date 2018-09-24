@@ -17,8 +17,10 @@ class Store {
         this.encrypted = encrypted;
         this.saveTimer = null;
         this.saving = false;
-        this.data = Store._load(this.path, this.encrypted, this.cryptr);
+
         console.log(this.path);
+
+        this.data = Store._load(this.path, this.encrypted, this.cryptr);
     }
 
     get(key, defaultValue = null) {
@@ -36,7 +38,7 @@ class Store {
         this.saveTimer = setTimeout(() => {
             this.saveTimer = null;
             this.save();
-        }, 200);
+        }, 50);
     }
 
     remove(key) {
