@@ -4,8 +4,9 @@ import { Client } from 'ssh2';
 class SshConnection extends Connection {
 
     async connect() {
-        return await this.connectSshPipe()
-            .connect();
+        let connection = await this.connectSshPipe();
+
+        return await connection.connect();
     }
 
     connectSshPipe() {
@@ -55,12 +56,14 @@ class SshConnection extends Connection {
     }
 
     async test() {
-        let data;
+        let data,
+            connection;
 
         try {
-            data = await this.connectSshPipe().test();
+            connection = await this.connectSshPipe();
+            data = await connection.test();
         } catch(err) {
-            throw new Error(err);
+            throw err;
         }
 
         this.disconnect();

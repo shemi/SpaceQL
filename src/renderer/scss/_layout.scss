@@ -18,6 +18,7 @@ body, html {
   .app-header {
 	background-color: $--color-background-main-header;
 	border-bottom: 1px solid $--color-border-main-header;
+	padding: 0;
   }
 
   .page-aside {

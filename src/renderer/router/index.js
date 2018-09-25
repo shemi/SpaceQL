@@ -42,7 +42,7 @@ export default new Router({
             path: '/connection/:id',
             name: 'connection',
             components: {
-                default: require('@/components/EmptyView').default,
+                default: require('@/components/Connection').default,
                 aside: require('@/components/ConnectionAside').default,
             },
             children: [
