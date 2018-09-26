@@ -2,6 +2,8 @@
     <div id="app">
 
         <el-container class="main-app-container">
+            <tabs-nav></tabs-nav>
+
             <el-header class="app-header">
                 <main-header></main-header>
             </el-header>
@@ -27,12 +29,14 @@
 
 <script>
     import MainHeader from './components/MainHeader';
+    import TabsNav from './components/TabNav';
 
     export default {
         name: "sonarr-pro",
 
         components: {
-            MainHeader
+            MainHeader,
+            TabsNav
         }
 
     };
