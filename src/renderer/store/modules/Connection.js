@@ -66,13 +66,14 @@ const actions = {
                     const connection = new Connection(data.connection);
 
                     commit('ADD_UPDATE_COLLECTION', connection);
-                    dispatch('Tabs/create', {
+
+                    return dispatch('Tabs/create', {
                         connection,
                         favorite: data.favorite,
-                        table: connection.getFirstTable()
-                    });
-
-                    resolve(connection);
+                    }, {root:true});
+                })
+                .then(tab => {
+                    resolve(tab);
                 })
                 .catch(err => reject(err))
         });

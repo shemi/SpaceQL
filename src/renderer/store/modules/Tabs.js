@@ -1,4 +1,5 @@
 import find from 'lodash/find';
+import filter from 'lodash/filter';
 import Tab from '../../Tab';
 import Vue from 'vue';
 
@@ -44,7 +45,12 @@ const mutations = {
         } else {
             state.collection.push(tab);
         }
+    },
+
+    REMOVE(state, tab) {
+        state.collection.splice(state.collection.indexOf(tab), 1);
     }
+
 };
 
 const getters = {
@@ -73,8 +79,22 @@ const actions = {
             ...data
         });
 
+        const tabsWithTheSameName = filter(state.collection, {name: tab.name});
+
+        console.log(tabsWithTheSameName);
+
+        if(tabsWithTheSameName.length > 0) {
+            tab.setDuplications(tabsWithTheSameName.length + 1);
+        }
+
         commit('ADD', tab);
         commit('SET', tab);
+
+        return tab;
+    },
+
+    remove({ commit, state }, tab) {
+        commit('REMOVE', tab);
     }
 
 };

@@ -16,6 +16,7 @@ export default class Tab {
         this.color = this.favorite.color || null;
         this.position = position || 0;
 
+        this.nameDuplication = 0;
     }
 
     activate() {
@@ -28,6 +29,24 @@ export default class Tab {
 
     deactivate() {
         this.isActive = false;
+    }
+
+    setDuplications(number) {
+        this.nameDuplication = number;
+    }
+
+    displayName() {
+        let name = '';
+
+        if(this.nameDuplication > 0) {
+            name += `#${this.nameDuplication} `;
+        }
+
+        if(this.table) {
+            name += this.table + ' - ';
+        }
+
+        return name + this.name;
     }
 
 }

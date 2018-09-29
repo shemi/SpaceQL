@@ -6,18 +6,20 @@ export default class Connection {
 
         let {
             id, name,
-            tables,form
+            form, databases, privileges
         } = rawConnection;
 
         this.id = id;
         this.name = name;
         this.form = form || {};
-        this.tables = tables || [];
+        this.databases = databases || [];
+        this.selectedDatabase = null;
+        this.privileges = privileges || [];
         this.log = [];
     }
 
-    getFirstTable() {
-       return this.tables.length > 0 ? this.tables[0] : '';
+    getFirstDatabase() {
+       return this.databases.length > 0 ? this.databases[0] : '';
     }
 
 }

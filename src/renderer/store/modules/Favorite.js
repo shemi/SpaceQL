@@ -47,6 +47,7 @@ const getters = {
     allFavorites(state) {
         return state.collection;
     },
+
     currentFavorite(state) {
         return state.current;
     }
@@ -56,9 +57,9 @@ const actions = {
     loadFavorites({ commit }) {
         Service.send(GET_ALL_FAVORITES)
             .then(favorites => {
-                console.log(favorites);
+
                 for(let favorite of favorites) {
-                    commit('PUSH_TO_COLLECTION', favorite);
+                    commit('ADD_UPDATE_COLLECTION', favorite);
                 }
             })
     },

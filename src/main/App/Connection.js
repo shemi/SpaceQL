@@ -1,6 +1,8 @@
 import * as connectors from './Connections';
 import * as drivers from './Drivers';
 import uuid from 'uuid/v4';
+import Favorite from "./Favorite";
+import DatabasesCollection from './DatabasesCollection';
 
 const connections = {};
 
@@ -9,6 +11,7 @@ export default class Connection {
     constructor(connectionForm) {
         let {type, driver, config, dbConfig} = Connection.transformConnectionForm(connectionForm);
 
+        this._original = connectionForm;
         this._type = type;
         this._driver = driver;
         this._config = config;
@@ -28,6 +31,10 @@ export default class Connection {
 
         this._connection = new Connector(this._config, this._dbConfig, Driver);
         this.driver = null;
+
+        this.databases = new DatabasesCollection;
+        this.systemDatabases = new DatabasesCollection;
+
     }
 
     test() {
@@ -37,6 +44,8 @@ export default class Connection {
     async connect() {
         try {
             this.driver = await this._connection.connect();
+            this.databases.setDriver(this.driver);
+            this.systemDatabases.setDriver(this.driver);
             connections[this.id] = this;
         } catch (e) {
             throw e;
@@ -46,11 +55,16 @@ export default class Connection {
     }
 
     getStartData() {
-        return this.driver.startData()
+        return this.driver.getInitData()
             .then(data => {
+                let favorite = this._original.id ? Favorite.get(this._original.id) : null;
+
                 return {
-                    id: this.id,
-                    ...data
+                    connection: {
+                        id: this.id,
+                        ...data
+                    },
+                    favorite: favorite ? favorite.toCollection() : null
                 }
             });
     }

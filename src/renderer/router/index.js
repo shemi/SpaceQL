@@ -39,17 +39,17 @@ export default new Router({
             },
         },
         {
-            path: '/connection/:id',
-            name: 'connection',
+            path: '/tab/:id',
+            name: 'tab',
             components: {
                 default: require('@/components/Connection').default,
                 aside: require('@/components/ConnectionAside').default,
             },
             children: [
                 {
-                    path: 'table/:tableName',
+                    path: 'table',
                     components: {
-                        default: require('@/components/TableExplorer').default,
+                        default: require('@/components/TableContent').default,
                     }
                 }
             ]

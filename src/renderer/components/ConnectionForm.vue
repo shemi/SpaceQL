@@ -268,9 +268,9 @@
                 this.busy = true;
 
                 this.$store.dispatch('Connection/connect', this.form)
-                    .then(data => {
+                    .then(tab => {
                         this.busy = false;
-                        this.$router.push(`/connection/${data.id}`);
+                        this.$router.push(`/tab/${tab.id}`);
                     })
                     .catch(err => {
                         this.busy = false;

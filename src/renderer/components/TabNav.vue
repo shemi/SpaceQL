@@ -1,13 +1,17 @@
 <template>
 
-    <div class="el-tabs el-tabs--top">
+    <div class="el-tabs el-tabs--card el-tabs--top">
 
         <div class="el-tabs__header is-top">
-            <span class="el-tabs__new-tab" @click="handleTabAdd" tabindex="0">
-                <i class="el-icon-plus"></i>
-            </span>
+            <div class="el-tabs__new-tab">
+                <el-button icon="el-icon-plus"
+                           @click="handleTabAdd"
+                           tabindex="0"
+                           size="mini" circle>
+                </el-button>
+            </div>
 
-            <div class="el-tabs__nav-wrap is-scrollable is-top">
+            <div class="el-tabs__nav-wrap is-top" :class="{'is-scrollable': scrollable}">
 
                 <template v-if="scrollable">
                     <span :class="['el-tabs__nav-prev', scrollable.prev ? '' : 'is-disabled']"
@@ -22,29 +26,26 @@
 
                 <div class="el-tabs__nav-scroll" ref="navScroll">
 
-                    <div class="el-tabs__nav is-top"
-                         ref="nav"
-                         :styl="navStyle"
-                         role="tablist"
-                         @keydown="changeTab">
+                    <div class="el-tabs__nav is-top" ref="nav" :style="navStyle" role="tablist">
 
-                        <div class="el-tabs__item is-top is-closable"
-                             :class="{'is-active': connection.isActive, 'is-focus': this.isFocus}"
-                             :id="connection.id"
+                        <div v-for="tab in tabs"
+                             class="el-tabs__item is-top is-closable"
+                             :class="{'is-active': tab.isActive, 'is-focus': isFocus}"
+                             :id="tab.id"
                              role="tab"
-                             :aria-selected="connection.isActive"
+                             :key="tab.id"
+                             :aria-selected="tab.isActive"
                              ref="tabs"
-                             tabindex={tabindex}
                              ref-in-for
                              @focus="() => {setFocus();}"
                              @blur="() => { removeFocus();}"
-                             @click="(ev) => { removeFocus(); onTabClick(pane, tabName, ev); }"
-                             @keydown="(ev) => { if (closable && (ev.keyCode === 46 || ev.keyCode === 8)) { onTabRemove(pane, ev);} }">
+                             @click="(ev) => { removeFocus(); handleTabClick(tab, ev); }"
+                             @keydown="(ev) => { if (ev.keyCode === 46 || ev.keyCode === 8) { closeTab(tab, ev);} }">
 
-                            {{ connection.name }}
+                            {{ tab.displayName() }}
 
                             <span class="el-icon-close"
-                                  @click="(ev) => { onTabRemove(pane, ev); }"></span>
+                                  @click="closeTab(tab, $event)"></span>
                         </div>
 
                     </div>
@@ -67,18 +68,7 @@
         components: {},
 
         props: {
-            panes: Array,
-            currentName: String,
-            onTabClick: {
-                type: Function,
-                default: noop
-            },
-            onTabRemove: {
-                type: Function,
-                default: noop
-            },
-            type: String,
-            stretch: Boolean
+
         },
 
         data() {
@@ -95,6 +85,10 @@
                 return {
                     transform: `translateX(-${this.navOffset}px)`
                 };
+            },
+
+            tabs() {
+                return this.$store.getters['Tabs/allTabs'];
             }
         },
 
@@ -161,6 +155,38 @@
                 this.navOffset = Math.max(newOffset, 0);
             },
 
+            handleTabClick(tab, event) {
+                this.$store.commit('Tabs/SET', tab);
+                this.$router.replace(`/tab/${tab.id}`);
+
+                this.$nextTick(() => {
+                    setTimeout(() => {
+                        this.scrollToActiveTab();
+                    }, 50);
+                });
+            },
+
+            closeTab(tab, e) {
+                e.stopPropagation();
+
+                const tabIndex = this.tabs.indexOf(tab);
+
+                if(tabIndex < 0) {
+                    return;
+                }
+
+                if(this.tabs.length === 1) {
+                    this.handleTabAdd();
+                }
+
+                this.$store.dispatch('Tabs/remove', tab);
+            },
+
+            handleTabAdd() {
+                this.$store.commit('Tabs/UNSET');
+                this.$router.replace('/');
+            },
+
             update() {
                 if (!this.$refs.nav) {
                     return;
@@ -174,8 +200,8 @@
                     const currentOffset = this.navOffset;
 
                     this.scrollable = this.scrollable || {};
-                    this.scrollable.prev = currentOffset;
-                    this.scrollable.next = currentOffset + containerSize < navSize;
+                    this.scrollable.next = currentOffset;
+                    this.scrollable.prev = currentOffset + containerSize < navSize;
 
                     if (navSize - currentOffset < containerSize) {
                         this.navOffset = navSize - containerSize;
@@ -281,3 +307,93 @@
         }
     };
 </script>
+
+<style lang="scss" scoped>
+    @import "../scss/variables";
+
+    $main-tabs-background-color: #e7e9ec;
+    $main-tabs-borders-color: #d2d5db;
+
+
+    .el-tabs {
+        position: relative;
+        background-color: $main-tabs-background-color;
+        overflow: hidden;
+    }
+
+    .el-tabs__header {
+        margin: 0;
+        padding: 0 5px;
+        border-bottom: 0;
+        position: relative;
+        /*overflow: hidden;*/
+
+        &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 1px;
+            top: 100%;
+            box-shadow: 0 -1px 16px 0px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .el-tabs__nav-wrap {
+            position: relative;
+            z-index: 2;
+        }
+
+        .el-tabs__new-tab {
+            color: black;
+            border: 0;
+            border-radius: 0;
+            height: auto;
+            width: auto;
+            line-height: 1;
+            margin: 6.74px 0 6.74px 5px;
+            text-align: center;
+            font-size: 22px;
+
+            .el-button:not(:hover) {
+                background-color: $--color-background-main-header;
+            }
+
+        }
+
+    }
+
+
+    .el-tabs--card > .el-tabs__header {
+        .el-tabs__nav {
+
+        }
+
+        .el-tabs__item {
+            border-radius: 10px 10px 0 0;
+
+            &:hover {
+                background-color: rgba($--color-background-main-header, 0.5);
+            }
+
+            &.is-active {
+                background-color: $--color-background-main-header;
+                border-bottom-color: $--color-background-main-header;
+            }
+        }
+    }
+
+    .el-tabs__nav-next,
+    .el-tabs__nav-prev {
+        z-index: 5;
+        background-color: $main-tabs-background-color;
+        color: $--color-black;
+
+        &.is-disabled {
+            color: rgba($--color-black, 0.5);
+        }
+
+    }
+
+</style>
