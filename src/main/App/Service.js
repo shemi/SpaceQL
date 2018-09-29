@@ -16,6 +16,8 @@ class Service {
                 .catch((e) => {
                     const message = e && e.message ? e.message : e;
                     event.sender.send(replyChannel, 'failure', message);
+
+                    console.error(e);
                 });
         });
     }

@@ -1,4 +1,4 @@
-import Collection from './Collection';
+import Collection from '../../utils/Collection';
 import Column from "./Column";
 
 export default class ColumnsCollection extends Collection {

@@ -7,14 +7,17 @@
                 <el-select v-model="database"
                            filterable
                            size="small"
+                           @change="handelDatabaseChange"
                            :disabled="! isActive"
                            placeholder="Choose Database...">
-                    <el-option
-                            v-for="db in databases"
-                            :key="db.name"
-                            :label="db.name"
-                            :value="db.name">
-                    </el-option>
+                    <template v-if="databases">
+                        <el-option v-for="db in databases.all()"
+                                   :key="db.name"
+                                   :label="db.name"
+                                   :value="db.name">
+                        </el-option>
+                    </template>
+
                 </el-select>
             </div>
         </div>
@@ -78,18 +81,32 @@
 
         data() {
             return {
-                databases: [{name: 'db 1'}],
-                database: ''
+                database: null
             }
         },
 
-        created() {
+        watch: {
+            connection: {
+                handler: function(connection) {
+                    if(! connection || ! connection.selectedDatabase.name) {
+                        this.database = null;
 
+                        return;
+                    }
+
+                    this.database = connection.selectedDatabase.name;
+                },
+                immediate: true
+            }
         },
 
         methods: {
-            goTo(path) {
+            handelDatabaseChange() {
+                if(! this.connection) {
+                    return;
+                }
 
+                this.connection.select(this.database);
             }
         },
 
@@ -104,6 +121,10 @@
 
             connection() {
                 return this.tab ? this.tab.connection : null;
+            },
+
+            databases() {
+                return this.connection ? this.connection.databases : null;
             },
 
             isActive() {

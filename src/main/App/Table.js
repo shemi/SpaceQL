@@ -1,5 +1,5 @@
 import ColumnsCollection from "./ColumnsCollection";
-import Collection from "./Collection";
+import Collection from "../../utils/Collection";
 
 
 export default class Table {
@@ -35,6 +35,21 @@ export default class Table {
         return {
             data: this.content.all(),
             columns
+        }
+    }
+
+    toRenderer() {
+        return {
+            name: this.name,
+            type: this.type,
+            engine: this.engine,
+            format: this.format,
+            rows: this.rows,
+            created_at: this.created_at,
+            collation: this.collation,
+            comment: this.comment,
+            columns: this.columns.toRenderer(),
+            content: this.content.toRenderer()
         }
     }
 

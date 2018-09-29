@@ -63,7 +63,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             Service.send(CONNECT, connectionForm)
                 .then(data => {
-                    const connection = new Connection(data.connection);
+                    const connection = new Connection(data.connection, connectionForm);
 
                     commit('ADD_UPDATE_COLLECTION', connection);
 
@@ -75,7 +75,9 @@ const actions = {
                 .then(tab => {
                     resolve(tab);
                 })
-                .catch(err => reject(err))
+                .catch(err => {
+                    reject(err);
+                })
         });
     }
 

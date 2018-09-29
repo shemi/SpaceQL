@@ -9,7 +9,12 @@ export default class Collection
     }
 
     collect(items) {
-        this.items = Array.isArray(items) ? items : [items];
+        this.items = [];
+        items = Array.isArray(items) ? items : [items];
+
+        for (let item of items) {
+            this.push(item);
+        }
 
         return this;
     }
@@ -36,6 +41,14 @@ export default class Collection
 
     find(predicate, fromIndex = 0) {
         return baseCollection.find(this.items, predicate, fromIndex);
+    }
+
+    first(predicate = null) {
+        if(! predicate) {
+            return this.items.length > 0 ? this.items[0] : null;
+        }
+
+        return this.find(predicate);
     }
 
     where(predicate) {
@@ -112,6 +125,21 @@ export default class Collection
 
     isNotEmpty() {
         return ! this.isEmpty();
+    }
+
+    toRenderer() {
+        let items = [],
+            item;
+
+        for(item of this.items) {
+            if(typeof item.toRenderer === 'function') {
+                items.push(item.toRenderer());
+            } else {
+                items.push(item);
+            }
+        }
+
+        return items;
     }
 
 }

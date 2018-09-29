@@ -7,49 +7,61 @@ class MysqlDriver extends Driver {
 
     connect() {
         return new Promise((resolve, reject) => {
-            this.connection = mysql.createPool(this.config);
+            mysql.createConnection(this.config)
+                .then(conn => {
+                    this.connection = conn;
+                    this.connected = true;
 
-            resolve(this);
+                    resolve(this);
+                })
+                .catch(err => {
+                    reject(err);
+                });
         });
     }
 
     async getInitData() {
-        this.keepOpen = true;
-
-        let data = {
-            version: await this.getVersion(conn),
-            databases: await conn.query('show databases'),
-            privileges: await conn.query('show privileges'),
+        return {
+            version: await this.getVersion(),
+            databases: await this.getDatabases(),
+            // privileges: await this.query('show privileges'),
         };
-
-        this.keepOpen = false;
-        this.releaseOpenConnection();
-
-        return data;
     }
 
-    async getDatabases(databaseName = null, fresh = false) {
-        if(! fresh && this.allDatabases.length > 0) {
-
-        }
-
-        let [rows, columns] = await conn.query(`
+    async getDatabases() {
+        let [rows, columns] = await this.query(`
             SELECT SCHEMA_NAME AS \`database\`, 
             DEFAULT_CHARACTER_SET_NAME AS \`default_character_set\`,
             DEFAULT_COLLATION_NAME AS \`default_collation\`
-            FROM INFORMATION_SCHEMA.SCHEMATA
-        `);
+            FROM INFORMATION_SCHEMA.SCHEMATA`);
 
+        return rows;
+    }
 
+    async getTables(database) {
+        let [tables, columns] = await this.query(`
+            select 
+                TABLE_NAME as \`name\`,
+                TABLE_TYPE as \`type\`,
+                ENGINE as \`engine\`, 
+                ROW_FORMAT as \`format\`,
+                CREATE_TIME as \`created_at\`,
+                TABLE_COLLATION as \`collation\`, 
+                TABLE_COMMENT as \`comment\`,
+                TABLE_SCHEMA
+            from INFORMATION_SCHEMA.TABLES
+            where TABLE_SCHEMA = ?
+        `, [database]);
 
+        return tables;
     }
 
     async getConnection() {
-        if(! this.openConnection) {
-            this.openConnection = await this.connection.getConnection();
+        if(! this.connected) {
+            await this.connect();
         }
 
-        return this.openConnection;
+        return this.connection;
     }
 
     async use(database, release = false) {
@@ -57,7 +69,7 @@ class MysqlDriver extends Driver {
             return this;
         }
 
-        await this.query('USE ' + '`'+database+'`', release);
+        await this.query('USE ?', [database], release);
         this.using = database;
 
         return this;
@@ -67,32 +79,16 @@ class MysqlDriver extends Driver {
         return new QueryBuilder;
     }
 
-    async query(sql, release = true) {
+    async query(sql, values = [], release = true) {
         const connection = await this.getConnection();
 
         if(sql instanceof QueryBuilder) {
             sql = (new MySqlGrammar).compileSelect(sql);
         }
 
-        let results = connection.query(sql);
-
-        if(release) {
-            this.releaseOpenConnection();
-        }
+        let results = connection.query(sql, values);
 
         return results;
-    }
-
-    releaseOpenConnection() {
-        if(this.keepOpen) {
-            return;
-        }
-
-        if(this.openConnection) {
-            this.openConnection.release();
-        }
-
-        this.openConnection = null;
     }
 
     async getVersion(full = false, refresh = false) {
@@ -141,11 +137,9 @@ class MysqlDriver extends Driver {
     }
 
     async test() {
-        let connection = await mysql.createConnection(this.config);
+        let version = await this.getVersion(true);
 
-        let version = await this.getVersion(connection, true);
-
-        await connection.end();
+        await this.disconnect();
 
         return {
             host: this.config.host,

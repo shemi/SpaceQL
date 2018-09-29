@@ -1,4 +1,4 @@
-import Collection from '../../utils/Collection';
+import Collection from "../utils/Collection";
 import Database from "./Database";
 
 export default class DatabasesCollection extends Collection {

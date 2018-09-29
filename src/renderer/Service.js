@@ -30,6 +30,8 @@ class Service {
                     case 'success':
                         return resolve(returnData);
                     case 'failure':
+                        console.error(new Error(returnData));
+
                         return reject(new Error(returnData));
                     default:
                         return reject(new Error(`Unexpected IPC call status "${status}" in ${route}`));

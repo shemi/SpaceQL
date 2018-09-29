@@ -1,7 +1,7 @@
 import * as events from '../../utils/main-events';
 import Service from './Service';
 import Favorite from './Favorite';
-import Connection from "./Connection";
+import ConnectionController from "./Controllers/ConnectionController";
 
 class App {
 
@@ -16,8 +16,8 @@ class App {
 
     listenToRendererEvents() {
         //connections
-        this.service.on(events.CONNECT, Connection.createConnection);
-        this.service.on(events.TEST_CONNECTION, Connection.testConnection);
+        this.service.on(events.CONNECT, ConnectionController.call('connect'));
+        this.service.on(events.TEST_CONNECTION, ConnectionController.call('test'));
 
         //favorites
         this.service.on(events.GET_ALL_FAVORITES, Favorite.getAllAndTransform);

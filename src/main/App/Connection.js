@@ -3,13 +3,14 @@ import * as drivers from './Drivers';
 import uuid from 'uuid/v4';
 import Favorite from "./Favorite";
 import DatabasesCollection from './DatabasesCollection';
+import Database from "./Database";
 
 const connections = {};
 
 export default class Connection {
 
     constructor(connectionForm) {
-        let {type, driver, config, dbConfig} = Connection.transformConnectionForm(connectionForm);
+        let {type, driver, config, dbConfig} = connectionForm;
 
         this._original = connectionForm;
         this._type = type;
@@ -34,11 +35,11 @@ export default class Connection {
 
         this.databases = new DatabasesCollection;
         this.systemDatabases = new DatabasesCollection;
-
+        this.version = null;
     }
 
-    test() {
-        return this._connection.test();
+    async test() {
+        return await this._connection.test();
     }
 
     async connect() {
@@ -54,57 +55,65 @@ export default class Connection {
         return this;
     }
 
-    getStartData() {
-        return this.driver.getInitData()
-            .then(data => {
-                let favorite = this._original.id ? Favorite.get(this._original.id) : null;
+    async initData() {
+        const {
+            databases,
+            version
+        } = await this.driver.getInitData();
 
-                return {
-                    connection: {
-                        id: this.id,
-                        ...data
-                    },
-                    favorite: favorite ? favorite.toCollection() : null
-                }
-            });
+        if(databases && databases.length > 0) {
+            await this.setDatabases(databases);
+        }
+
+        this.version = version;
+
+        return this;
+    }
+
+    async getTables(database) {
+        return await this.driver.getTables(database);
+    }
+
+    async setDatabases(databases) {
+        let rawDatabase,
+            database,
+            firstTable = this._dbConfig.database,
+            selectedDatabase;
+
+        for (rawDatabase of databases) {
+            database = new Database(rawDatabase, this);
+
+            if(database.isSystemDatabase()) {
+                this.systemDatabases.push(database);
+            } else {
+                this.databases.push(database);
+            }
+        }
+
+        if(firstTable) {
+            selectedDatabase = this.databases.find({name: firstTable});
+        } else {
+            selectedDatabase = this.databases.first();
+        }
+
+        if(selectedDatabase instanceof Database) {
+            await selectedDatabase.loadTables();
+        }
+
+        return this;
     }
 
     static getConnection(id) {
         return connections[id];
     }
 
-    static testConnection(connectionForm) {
-        let inst = new Connection(connectionForm);
-
-        return inst.test();
-    }
-
-    static createConnection(connectionForm) {
-        let inst = new Connection(connectionForm);
-
-        return inst.connect()
-            .then(c => c.getStartData());
-    }
-
-    static transformConnectionForm(form) {
+    toRenderer() {
         return {
-            type: form.connectionType,
-            driver: form.driver,
-            dbConfig: {
-                host: form.dbHost,
-                port: form.dbPort,
-                user: form.dbUsername,
-                password: form.dbPassword,
-                database: form.dbName,
-            },
-            config: {
-                host: form.sshHost,
-                port: form.sshPort,
-                user: form.sshUsername,
-                password: form.sshPassword,
-                key: form.sshKeyFilePath,
-                socket: form.socketPath
-            }
+            id: this.id,
+            name: this._dbConfig.user+'@'+this._dbConfig.host+':'+this._dbConfig.port,
+            version: this.version,
+            databases: this.databases.toRenderer(),
+            systemDatabases: this.systemDatabases.toRenderer()
         }
     }
 

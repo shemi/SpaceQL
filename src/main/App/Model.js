@@ -73,7 +73,7 @@ class Model {
         let data = store.get(inst._getStoreKey(id));
 
         if(! data) {
-            throw new Error(`No ${inst.constructor.name} with the ID: ${id} found.`);
+            return null;
         }
 
         inst._populate(data, id);
@@ -113,6 +113,10 @@ class Model {
             ...this.data,
             id: this.id,
         };
+    }
+
+    toRenderer() {
+        return this.toCollection();
     }
 
 }

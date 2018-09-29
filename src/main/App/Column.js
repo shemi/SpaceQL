@@ -26,4 +26,21 @@ export default class Column {
         this.table = table;
     }
 
+    toRenderer() {
+        return {
+            name: this.name,
+            position: this.position,
+            default_value: this.default_value,
+            is_nullable: this.is_nullable,
+            data_type: this.data_type,
+            character_maximum_length: this.character_maximum_length,
+            character_set: this.character_set,
+            collation: this.collation,
+            column_key: this.column_key,
+            extra: this.extra,
+            privileges: this.privileges,
+            comment: this.comment
+        }
+    }
+
 }
