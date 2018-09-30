@@ -45,7 +45,8 @@ export default class Database {
     }
 
     isSystemDatabase() {
-        return ['information_schema', 'performance_schema', 'mysql'].indexOf(this.name.toLocaleLowerCase()) >= 0;
+        return ['information_schema', 'performance_schema', 'mysql', 'sys']
+            .indexOf(this.name.toLocaleLowerCase()) >= 0;
     }
 
     toRenderer() {
