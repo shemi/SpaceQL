@@ -2,7 +2,7 @@ import TablesCollection from './TablesCollection';
 
 export default class Database {
 
-    constructor(data, driver) {
+    constructor(data, connection) {
         let {database, tables,
             default_character_set,
             default_collation} = data;
@@ -11,7 +11,7 @@ export default class Database {
         this.tables = new TablesCollection(tables || [], this);
         this.default_character_set = default_character_set;
         this.default_collation = default_collation;
-        this.driver = driver;
+        this.connection = connection;
 
         this.tablesLoaded = false;
     }
@@ -27,21 +27,25 @@ export default class Database {
     }
 
     async loadTables() {
-        let tables = await this.driver.getTables(this.name);
+        let tables = await this.connection.getTables(this.name);
 
         this.tables.collect(tables);
         this.tablesLoaded = true;
     }
 
     async queryTable(tableName, query, order, limit) {
-        const builder = this.driver
-            .use(this.name)
-            .builder()
-            .select(tableName);
+        const db = await this.connection.use(this.name);
+
+        const builder = db.builder()
+            .table(tableName)
+            .take(limit);
+        
 
         if(query && query.value) {
 
         }
+
+        return await builder.get();
     }
 
     isSystemDatabase() {

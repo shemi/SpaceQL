@@ -13,11 +13,11 @@ export default class QueryBuilder {
         this.driver = driver;
         this.databse = '';
 
-        this.table = '';
+        this.from = '';
         this.columns = ['*'];
         this.wheres = [];
         this.orders = [];
-        this.rowsLimit = null;
+        this.limit = null;
 
     }
 
@@ -27,8 +27,8 @@ export default class QueryBuilder {
         return this;
     }
 
-    from(name) {
-        this.table = name;
+    table(name) {
+        this.from = name;
 
         return this;
     }
@@ -58,9 +58,9 @@ export default class QueryBuilder {
         return this;
     }
 
-    limit(limit) {
+    take(limit) {
         if(limit) {
-            this.rowsLimit = limit;
+            this.limit = limit;
         }
 
         return this;
@@ -71,7 +71,7 @@ export default class QueryBuilder {
     }
 
     async get() {
-        return await this.driver.select(this);
+        return await this.driver.query(this);
     }
 
 }

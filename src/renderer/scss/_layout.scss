@@ -28,6 +28,11 @@ body, html {
 
   .page-main-content {
 	background-color: $--color-background-main-content;
+
+	.el-main {
+	  padding: 0;
+	}
+
   }
 
 }

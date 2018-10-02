@@ -4,8 +4,8 @@ export default class Collection
 {
 
     constructor(items = [], driver = null) {
-        this.collect(items);
         this.driver = driver;
+        this.collect(items);
     }
 
     collect(items) {
@@ -125,6 +125,12 @@ export default class Collection
 
     isNotEmpty() {
         return ! this.isEmpty();
+    }
+
+    deleteAll() {
+        this.items = [];
+
+        return this;
     }
 
     toRenderer() {

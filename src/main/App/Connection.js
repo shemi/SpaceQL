@@ -70,6 +70,12 @@ export default class Connection {
         return this;
     }
 
+    async use(database) {
+        await this.driver.use(database);
+
+        return this.driver;
+    }
+
     async getTables(database) {
         return await this.driver.getTables(database);
     }

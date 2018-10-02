@@ -1,7 +1,6 @@
 <template>
 
-    <div>
-        <p>connection</p>
+    <div class="connection-content">
         <router-view :key="$route.fullPath"></router-view>
     </div>
 

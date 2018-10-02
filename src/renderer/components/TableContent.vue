@@ -1,7 +1,8 @@
 <template>
 
     <div>
-        <data-table :columns="columns"
+        <data-table :columns="columns" sortable editable
+                    :loading="loading"
                     :content="content">
         </data-table>
     </div>
@@ -15,23 +16,72 @@
 
         data() {
             return {
-                columns: [
-                    {name: 'test_1'},
-                    {name: 'test_2'},
-                    {name: 'test_3'},
-                    {name: 'test_4'},
-                    {name: 'test_5'},
-                ],
-                content: [
-                    {
-                        test_1: 'test 1 value',
-                        test_2: 'test 2 value',
-                        test_3: 'test 3 value',
-                        test_4: 'test 4 value',
-                        test_5: 'test 5 value',
-                    }
-                ]
+                loading: false,
+                query: {},
+                order: {},
+                limit: 100,
+                loaded: false
             }
+        },
+
+        watch: {
+            table: {
+                handler(table) {
+                    this.fetchContent();
+                },
+                deep: false,
+                immediate: true
+            }
+        },
+
+        methods: {
+            fetchContent() {
+                if(! this.table || this.loaded) {
+                    return;
+                }
+
+                this.loading = true;
+                // this.loaded = true;
+
+                this.table.getContent(this.query, this.order, this.limit)
+                    .then(table => {
+                        this.loading = false;
+                    })
+                    .catch(err => {
+                        console.log('table', err);
+                    })
+            }
+        },
+
+        computed: {
+            tab() {
+                return this.$store.getters['Tabs/currentTab'];
+            },
+
+            tabId() {
+                return this.tab ? this.tab.id : '';
+            },
+
+            connection() {
+                return this.tab ? this.tab.connection : null;
+            },
+
+            database() {
+                return this.connection ? this.connection.selectedDatabase : null;
+            },
+
+            table() {
+                return this.database ? this.database.selectedTable : null;
+            },
+
+            columns() {
+                return this.table ? this.table.columns.all() : [];
+            },
+
+            content() {
+                return this.table ? this.table.content.all() : [];
+            }
+
         },
 
         components: {

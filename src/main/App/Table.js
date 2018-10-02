@@ -28,13 +28,17 @@ export default class Table {
     }
 
     async getContent(query = null, order = null, limit = 200) {
+        this.columns.deleteAll();
+        this.content.deleteAll();
+
         let [data, columns] = await this.database.queryTable(this.name, query, order, limit);
 
         this.content.collect(data);
+        this.columns.collect(columns);
 
         return {
-            data: this.content.all(),
-            columns
+            rows: this.content.toRenderer(),
+            columns: this.columns.toRenderer()
         }
     }
 

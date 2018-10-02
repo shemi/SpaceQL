@@ -7,7 +7,8 @@ export default class Grammar {
         'columns',
         'from',
         'wheres',
-        'orders'
+        'orders',
+        'limit'
     ];
 
     constructor(tablePrefix = '') {
@@ -39,7 +40,7 @@ export default class Grammar {
             }
         }
 
-        return sql;
+        return sql.join(' ');
     }
 
     compileColumns(query, columns) {
@@ -47,7 +48,7 @@ export default class Grammar {
     }
 
     columnize(columns) {
-        return columns.map(this.wrap).join(', ');
+        return columns.map(this.wrap.bind(this)).join(', ');
     }
 
     wrap(value) {
@@ -123,6 +124,14 @@ export default class Grammar {
         this.tablePrefix = prefix;
 
         return this;
+    }
+
+    compileLimit(query, limit) {
+        if(! limit) {
+            return '';
+        }
+
+        return 'limit ' + parseInt(limit);
     }
 
 }

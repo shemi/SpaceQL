@@ -1,4 +1,7 @@
 import Collection from "../utils/Collection";
+import Service from "./Service";
+import Connection from "./Connection";
+import {CONNECT} from "../utils/main-events";
 
 
 export default class Table {
@@ -23,6 +26,24 @@ export default class Table {
         this.content = new Collection([], this);
 
         this.database = database;
+    }
+
+    getContent(query = {}, order = {}, limit = 100) {
+        this.columns.deleteAll();
+        this.content.deleteAll();
+
+        return new Promise((resolve, reject) => {
+            Service.send('TableController@content', this.database.connection.id, this.database.name, this.name, query, order, limit)
+                .then(({rows, columns}) => {
+                    this.content.merge(rows);
+                    this.columns.merge(columns);
+
+                    resolve(this);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+        });
     }
 
 }

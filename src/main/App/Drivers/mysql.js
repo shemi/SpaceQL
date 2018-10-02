@@ -69,24 +69,30 @@ class MysqlDriver extends Driver {
             return this;
         }
 
-        await this.query('USE ?', [database], release);
+        await this.query('USE '+ database, [], release);
         this.using = database;
 
         return this;
     }
 
     builder() {
-        return new QueryBuilder;
+        return new QueryBuilder(this);
     }
 
     async query(sql, values = [], release = true) {
         const connection = await this.getConnection();
+        let results;
 
         if(sql instanceof QueryBuilder) {
             sql = (new MySqlGrammar).compileSelect(sql);
+            console.log(sql);
         }
 
-        let results = connection.query(sql, values);
+        try {
+            results = await connection.query(sql, values);
+        } catch (e) {
+            throw e;
+        }
 
         return results;
     }

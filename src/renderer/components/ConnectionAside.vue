@@ -4,7 +4,9 @@
 
         <ul class="tables-list" v-if="tables">
 
-            <li v-for="table in tables.all()" :key="table.name">
+            <li v-for="table in tables.all()"
+                @click="selectTable(table)"
+                :key="table.name">
                 {{ table.name }}
             </li>
 
@@ -17,6 +19,14 @@
 <script>
 
     export default {
+
+        methods: {
+            selectTable(table) {
+                console.log('selecting', table);
+
+                this.$set(this.database, 'selectedTable', table);
+            }
+        },
 
         computed: {
             tab() {
