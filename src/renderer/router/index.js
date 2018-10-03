@@ -47,6 +47,12 @@ export default new Router({
             },
             children: [
                 {
+                    path: 'query',
+                    components: {
+                        default: require('@/components/Query').default,
+                    }
+                },
+                {
                     path: 'table',
                     components: {
                         default: require('@/components/TableContent').default,

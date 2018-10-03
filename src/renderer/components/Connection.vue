@@ -39,4 +39,11 @@
 
 <style lang="scss">
 
+    .connection-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
 </style>
