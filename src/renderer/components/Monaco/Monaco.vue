@@ -146,6 +146,9 @@
                 this.editor.onMouseMove(event => this.$emit('mouseMove', event));
                 this.editor.onMouseUp(event => this.$emit('mouseUp', event));
 
+                this.editor.addCommand(this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.Enter, (e) => this.$emit('execute', e));
+                this.editor.addCommand(this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.KEY_S, (e) => this.$emit('save', e));
+
                 this.editor.layout();
             },
 
