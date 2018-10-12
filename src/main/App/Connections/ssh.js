@@ -29,6 +29,7 @@ class SshConnection extends Connection {
                         }
 
                         dbConfig.host = 'localhost';
+                        dbConfig.port = 12345;
                         dbConfig.stream = stream;
                         this.driver.setConfig(dbConfig);
 

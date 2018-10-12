@@ -120,6 +120,11 @@
             </el-button>
         </div>
 
+        <button type="button"
+                @click="testSlowDown">
+            slow down
+        </button>
+
     </div>
 
 </template>
@@ -303,6 +308,13 @@
                         this.$set(this.form, formKey, filePaths[0]);
                     }
                 );
+            },
+
+            testSlowDown() {
+                service.send('QueryController@slowDown')
+                    .then(res => {
+                        console.log(res);
+                    });
             }
         },
 

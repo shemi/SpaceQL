@@ -1,4 +1,5 @@
 import TablesCollection from './TablesCollection';
+import RowsChunks from './RowsChunks';
 
 export default class Database {
 
@@ -46,6 +47,40 @@ export default class Database {
         }
 
         return await builder.get();
+    }
+
+    query(query) {
+        const chunkSize = RowsChunks.getRowsPerChunk();
+
+        return new Promise((resolve, reject) => {
+            this.connection.use(this.name)
+                .then(db => db.query(query))
+                .then(([rowsSets, columnsSets]) => {
+                    rowsSets = (! Array.isArray(rowsSets[0])) ? [rowsSets] : rowsSets;
+                    columnsSets = (! Array.isArray(columnsSets[0])) ? [columnsSets] : columnsSets;
+
+                    let sets = [];
+
+                    for(let setIndex in rowsSets) {
+                        let rows = rowsSets[setIndex];
+                        let columns = columnsSets[setIndex];
+                        let total = rows ? rows.length : 0;
+                        let chunksId = null;
+
+                        if(total > chunkSize) {
+                            let chunk = RowsChunks.create(rows);
+
+                            rows = chunk.rows;
+                            chunksId = chunk.id;
+                        }
+
+                        sets.push([rows, columns, chunksId, total, setIndex]);
+                    }
+
+                    resolve(sets);
+                })
+                .catch(err => reject(err));
+        });
     }
 
     isSystemDatabase() {

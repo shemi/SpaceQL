@@ -1,4 +1,5 @@
 import DatabasesCollection from "./DatabasesCollection";
+import Service from "./Service";
 
 export default class Connection {
 

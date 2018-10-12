@@ -10,7 +10,7 @@ export default class Controller {
         return data;
     }
 
-    getConnectionDatabaseAndTable(connectionId, databaseName, tableName) {
+    getConnectionAndDatabase(connectionId, databaseName) {
         const connection = Connection.getConnection(connectionId);
 
         if(! connection) {
@@ -22,6 +22,15 @@ export default class Controller {
         if(! database) {
             throw new Error(`Can't find database with the name: ${databaseName}`);
         }
+
+        return {
+            connection,
+            database
+        }
+    }
+
+    getConnectionDatabaseAndTable(connectionId, databaseName, tableName) {
+        const {connection, database} = this.getConnectionAndDatabase(connectionId, databaseName);
 
         const table = database.tables.find({name: tableName});
 

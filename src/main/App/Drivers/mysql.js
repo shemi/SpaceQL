@@ -80,21 +80,18 @@ class MysqlDriver extends Driver {
     }
 
     async query(sql, values = [], release = true) {
-        const connection = await this.getConnection();
-        let results;
-
         if(sql instanceof QueryBuilder) {
             sql = (new MySqlGrammar).compileSelect(sql);
-            console.log(sql);
         }
 
-        try {
-            results = await connection.query(sql, values);
-        } catch (e) {
-            throw e;
-        }
-
-        return results;
+        return new Promise((resolve, reject) => {
+            this.getConnection()
+                .then(connection => connection.query(sql, values))
+                .then(results => {
+                    resolve(results);
+                })
+                .catch(e => reject(e));
+        });
     }
 
     async getVersion(full = false, refresh = false) {
@@ -139,6 +136,8 @@ class MysqlDriver extends Driver {
     setConfig(config) {
         this.config = {
             ...config,
+            multipleStatements: true,
+            dateStrings: true
         }
     }
 

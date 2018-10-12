@@ -28,10 +28,6 @@
             rowIndex: Number
         },
 
-        created() {
-            console.log('data cell');
-        },
-
         data() {
             return {
 

@@ -7,21 +7,15 @@
 
             </div>
 
-            <div v-for="(column, index) in columns"
-                 ref="cells"
-                 :key="column.name"
-                 :data-cell-key="'cell_'+index+'_'+column.name"
-                 class="data-table-cell data-table-header-cell">
-                <div class="cell-content">{{ column.name }}</div>
-
-                <span class="caret-wrapper" v-if="isSortable">
-                    <span class="caret-holder">
-                        <i class="sort-caret ascending"></i><i class="sort-caret descending"></i>
-                    </span>
-                </span>
-
-                <div class="resize-handler"></div>
-            </div>
+            <data-table-header-cell
+                v-for="(column, index) in columns"
+                ref="cells"
+                :key="index+column.name"
+                :column="column"
+                :index="index"
+                :is-sortable="isSortable"
+            >
+            </data-table-header-cell>
 
         </div>
 
@@ -30,6 +24,7 @@
 </template>
 
 <script>
+    import DataTableHeaderCell from './DataTableHeaderCell';
 
     export default {
 
@@ -52,10 +47,8 @@
 
         watch: {
             columns: {
-                handler(table) {
-                    this.$nextTick(() => {
-                        this.init();
-                    });
+                handler(newColumns, oldColumns) {
+
                 },
                 deep: true,
                 immediate: true
@@ -63,49 +56,6 @@
         },
 
         methods: {
-            init() {
-                if(! this.columns || ! this.columns.length) {
-                    return;
-                }
-
-                for(let columnIndex in this.columns) {
-                    const cell = this.$refs['cells'][columnIndex];
-
-                    this.updateCellWidth(columnIndex, cell.getBoundingClientRect().width+'px');
-                }
-
-                this.initResize();
-            },
-
-            initResize() {
-                const cells = this.$refs.cells;
-                const self = this;
-
-                if(! cells) {
-                    return;
-                }
-
-                for (let i = 0;i < cells.length; i++) {
-                    const currentCell = cells[i],
-                        currentResizeHandler = currentCell.querySelector('.resize-handler');
-
-                    currentResizeHandler.addEventListener('mousedown', function(e) {
-                        e.preventDefault();
-                        window.addEventListener('mousemove', resize);
-                        window.addEventListener('mouseup', stopResize);
-                    });
-
-                    function resize(e) {
-                        self.$nextTick(() => {
-                            self.updateCellWidth(i, e.pageX - currentCell.getBoundingClientRect().left + 'px');
-                        });
-                    }
-
-                    function stopResize() {
-                        window.removeEventListener('mousemove', resize)
-                    }
-                }
-            },
 
             updateCellWidth(columnIndex, width) {
                 const cellElement = this.$refs['cells'][columnIndex];
@@ -114,6 +64,10 @@
                 this.rootTable.updateCellWidth(columnIndex, width);
             }
 
+        },
+
+        components: {
+            DataTableHeaderCell
         }
 
     }

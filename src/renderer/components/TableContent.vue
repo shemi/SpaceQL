@@ -1,10 +1,12 @@
 <template>
 
-    <div>
+    <div class="snr-table-content-container">
+
         <data-table :columns="columns" sortable editable
                     :loading="loading"
                     :content="content">
         </data-table>
+
     </div>
 
 </template>
@@ -91,3 +93,13 @@
     }
 
 </script>
+
+<style>
+
+    .snr-table-content-container {
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+    }
+
+</style>

@@ -2,11 +2,31 @@
 
     <div class="snr-query-container">
         <div ref="topWindow" class="query-editor">
-            <monaco v-model="queryString" language="mysql" ref="editor"></monaco>
+            <monaco v-model="queryString"
+                    language="mysql"
+                    @execute="exec"
+                    ref="editor"></monaco>
         </div>
 
-        <div ref="bottomWindow" class="query-results-table">
-            query results
+        <div ref="bottomWindow" class="query-results-table" v-loading="loading">
+            <el-tabs v-model="query.selectedTab" type="card" v-if="! loading">
+
+                <el-tab-pane v-for="set in query.resultsSets"
+                             :label="'Results #' + set.index"
+                             lazy
+                             :name="'' + set.index">
+
+                    <data-table :columns="set.columns"
+                                :chunks-id="set.chunksId"
+                                :total="set.total"
+                                ref="dataTables"
+                                @load-next="handelLoadMore(set)"
+                                :content="set.rows">
+                    </data-table>
+
+                </el-tab-pane>
+
+            </el-tabs>
         </div>
     </div>
 
@@ -15,43 +35,106 @@
 <script>
     import Split from 'split.js';
     import Monaco from './Monaco/Monaco';
+    import DataTable from './DataTable/DataTable';
 
     export default {
 
         data() {
             return {
-                queryString: '',
-
+                activeTab: '1',
+                loading: false,
+                queryString: ''
             }
         },
 
         mounted() {
-            Split([this.$refs.topWindow, this.$refs.bottomWindow], {
-                direction: 'vertical',
-                sizes: [40, 60],
-                minSize: [50, 50],
-                onDrag: this.onDrag.bind(this),
-                elementStyle(dimension, size, gutterSize) {
-                    return {
-                        'height': 'calc(' + size + '% - ' + gutterSize + 'px)'
-                    }
-                },
-                gutterStyle(dimension, gutterSize) {
-                    return {
-                        'flex-basis':  gutterSize + 'px'
-                    }
-                }
-            });
-        },
+            this.initPageSplit();
 
-        methods: {
-            onDrag() {
-                console.log(this.$refs.editor.getMonaco().layout());
+            if(this.query) {
+                this.queryString = this.query.lastSql;
+
+                if(this.$refs.dataTables && this.$refs.dataTables[this.query.selectedTab]) {
+                    this.$nextTick(() => {
+                        this.$refs.dataTables[this.query.selectedTab].updateList();
+                    });
+                }
             }
         },
 
+        methods: {
+            initPageSplit() {
+                Split([this.$refs.topWindow, this.$refs.bottomWindow], {
+                    direction: 'vertical',
+                    sizes: [40, 60],
+                    minSize: [50, 50],
+                    onDrag: this.onDrag.bind(this),
+                    elementStyle(dimension, size, gutterSize) {
+                        return {
+                            'height': 'calc(' + size + '% - ' + gutterSize + 'px)'
+                        }
+                    },
+                    gutterStyle(dimension, gutterSize) {
+                        return {
+                            'flex-basis':  gutterSize + 'px'
+                        }
+                    }
+                });
+            },
+
+            onDrag() {
+                if(! this.$refs.editor) {
+                    return;
+                }
+
+                this.$refs.editor.getMonaco().layout()
+            },
+
+            exec() {
+                if(! this.database) {
+                    return;
+                }
+
+                this.loading = true;
+
+                this.query.exec(this.queryString)
+                    .then(() => {
+                        this.loading = false;
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+            },
+
+            handelLoadMore(set) {
+                set.next();
+            }
+        },
+
+        computed: {
+            tab() {
+                return this.$store.getters['Tabs/currentTab'];
+            },
+
+            tabId() {
+                return this.tab ? this.tab.id : '';
+            },
+
+            connection() {
+                return this.tab ? this.tab.connection : null;
+            },
+
+            database() {
+                return this.connection ? this.connection.selectedDatabase : null;
+            },
+
+            query() {
+                return this.database ? this.database.query : null;
+            },
+        },
+
         components: {
-            Monaco
+            Monaco,
+            DataTable
         }
 
     }
@@ -88,6 +171,34 @@
         .gutter.gutter-vertical {
             background-image:  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
             cursor: ns-resize;
+        }
+
+        .el-tabs {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+
+            .el-tabs__header {
+                flex-grow: 0;
+                margin: 0 0 -1px 0;
+            }
+
+            .el-tabs__content {
+                flex-grow: 1;
+                height: 100%;
+            }
+
+            .el-tab-pane {
+                height: 100%;
+            }
+
+            .el-tabs__item {
+                height: 30px;
+                line-height: 30px;
+                border-radius: 0;
+            }
+
         }
 
     }

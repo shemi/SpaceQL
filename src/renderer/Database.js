@@ -1,4 +1,6 @@
 import TablesCollection from "./TablesCollection";
+import Service from "./Service";
+import Query from "./Query";
 
 export default class Database {
 
@@ -15,6 +17,12 @@ export default class Database {
         this.default_collation = default_collation;
 
         this.connection = connection;
+
+        this.query = new Query(this);
+    }
+
+    connectionId() {
+        return this.connection.id;
     }
 
 }
