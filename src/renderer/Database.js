@@ -25,4 +25,8 @@ export default class Database {
         return this.connection.id;
     }
 
+    tabId() {
+        return this.connection.tabId();
+    }
+
 }

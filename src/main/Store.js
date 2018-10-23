@@ -1,7 +1,7 @@
 import electron from 'electron';
 import fs from 'fs';
 import path from 'path';
-import config from '../../utils/config';
+import config from '../utils/config';
 import Cryptr from 'cryptr';
 import {get, set, unset} from 'lodash';
 
@@ -47,10 +47,7 @@ class Store {
         unset(this.data, key);
         this.changed = true;
 
-        this.saveTimer = setTimeout(() => {
-            this.saveTimer = null;
-            this.save();
-        }, 200);
+        this.save();
     }
 
     save() {
@@ -74,11 +71,9 @@ class Store {
     static instance(file = null, encrypted = true) {
         file = (file || config.dataFileName);
 
-        if(StoreInstances[file]) {
-            return StoreInstances[file];
+        if(! StoreInstances[file]) {
+            StoreInstances[file] = new Store(file, encrypted);
         }
-
-        StoreInstances[file] = new Store(file, encrypted);
 
         return StoreInstances[file];
     }

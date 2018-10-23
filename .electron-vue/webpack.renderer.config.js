@@ -124,7 +124,9 @@ let rendererConfig = {
         ? path.resolve(__dirname, '../node_modules')
         : false
     }),
-    new webpack.HotModuleReplacementPlugin(),
+    new webpack.HotModuleReplacementPlugin({
+        dynamicPublicPath: true
+    }),
     new webpack.NoEmitOnErrorsPlugin(),
     new MonacoWebpackPlugin({
         languages: ['mysql', 'pgsql', 'sql'],

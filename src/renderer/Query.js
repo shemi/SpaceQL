@@ -97,4 +97,8 @@ export default class Query {
         Vue.delete(this.resultsSets, setIndex);
     }
 
+    tabId() {
+        return this.database.tabId();
+    }
+
 }

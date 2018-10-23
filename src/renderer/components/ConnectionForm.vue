@@ -3,7 +3,7 @@
     <div class="connection-form-card">
 
         <div class="connection-form-header">
-            <el-radio-group v-model="form.connectionType" size="mini">
+            <el-radio-group v-model="tab.connectionForm.connectionType" size="mini">
                 <el-radio-button label="tcp">Standard</el-radio-button>
                 <el-radio-button label="socket" disabled>Socket</el-radio-button>
                 <el-radio-button label="ssh">SSH</el-radio-button>
@@ -11,11 +11,11 @@
         </div>
 
         <div class="connection-form-content">
-            <el-form ref="form" :model="form" label-width="120px" size="mini">
+            <el-form ref="tab.connectionForm" :model="form" label-width="120px" size="mini">
 
                 <template v-if="isFavorite">
                     <el-form-item label="Name">
-                        <el-input v-model="form.name"></el-input>
+                        <el-input v-model="tab.connectionForm.name"></el-input>
                     </el-form-item>
 
                     <el-form-item>
@@ -24,7 +24,7 @@
                                    v-for="color in colors"
                                    :title="color.name"
                                    :key="color.color">
-                                <input type="radio" v-model="form.color" :value="color.color">
+                                <input type="radio" v-model="tab.connectionForm.color" :value="color.color">
                                 <span class="color-bubble" :style="{backgroundColor: color.color}">
                                     <i class="check-mark el-icon-check"></i>
                                 </span>
@@ -35,47 +35,47 @@
 
                 <el-form-item label="DB Host" class="host-port-fields">
                     <el-col :span="16">
-                        <el-input v-model="form.dbHost"></el-input>
+                        <el-input v-model="tab.connectionForm.dbHost"></el-input>
                     </el-col>
                     <el-col :span="8">
-                        <el-input-number v-model="form.dbPort" controls-position="right" placeholder="Port"></el-input-number>
+                        <el-input-number v-model="tab.connectionForm.dbPort" controls-position="right" placeholder="Port"></el-input-number>
                     </el-col>
                 </el-form-item>
 
                 <el-form-item label="Username">
-                    <el-input v-model="form.dbUsername"></el-input>
+                    <el-input v-model="tab.connectionForm.dbUsername"></el-input>
                 </el-form-item>
 
                 <el-form-item label="Password">
-                    <el-input v-model="form.dbPassword" type="password" clearable></el-input>
+                    <el-input v-model="tab.connectionForm.dbPassword" type="password" clearable></el-input>
                 </el-form-item>
 
                 <el-form-item label="Database">
-                    <el-input v-model="form.dbName" placeholder="optional" clearable></el-input>
+                    <el-input v-model="tab.connectionForm.dbName" placeholder="optional" clearable></el-input>
                 </el-form-item>
 
-                <template v-if="form.connectionType === 'ssh'">
+                <template v-if="tab.connectionForm.connectionType === 'ssh'">
                     <div class="form-divider"></div>
 
                     <el-form-item label="SSH Host" class="host-port-fields">
                         <el-col :span="16">
-                            <el-input v-model="form.sshHost"></el-input>
+                            <el-input v-model="tab.connectionForm.sshHost"></el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input-number v-model="form.sshPort" controls-position="right" placeholder="SSH Port"></el-input-number>
+                            <el-input-number v-model="tab.connectionForm.sshPort" controls-position="right" placeholder="SSH Port"></el-input-number>
                         </el-col>
                     </el-form-item>
 
                     <el-form-item label="SSH User">
-                        <el-input v-model="form.sshUsername"></el-input>
+                        <el-input v-model="tab.connectionForm.sshUsername"></el-input>
                     </el-form-item>
 
                     <el-form-item label="SSH Password">
-                        <el-input v-model="form.sshPassword" type="password" clearable></el-input>
+                        <el-input v-model="tab.connectionForm.sshPassword" type="password" clearable></el-input>
                     </el-form-item>
 
                     <el-form-item label="SSH Key File">
-                        <el-input v-model="form.sshKeyFilePath" clearable>
+                        <el-input v-model="tab.connectionForm.sshKeyFilePath" clearable>
                             <el-button slot="append"
                                        @click="getFilePath('sshKeyFilePath', 'Select SSH key file')"
                                        icon="el-icon-more"></el-button>
@@ -138,28 +138,9 @@
     import { COLORS } from "../../utils/constants";
     import service from '../Service';
     import { createNamespacedHelpers } from 'vuex';
+    import Tab from '../Tab';
 
     const { mapGetters, mapActions } = createNamespacedHelpers('Favorite');
-
-    const crateConnectionForm = (data = {}) => {
-        return Object.assign({
-            name: '',
-            color: 'black',
-            connectionType: 'tcp',
-            driver: 'mysql',
-            dbHost: '127.0.0.1',
-            dbPort: '3306',
-            dbName: '',
-            dbUsername: 'root',
-            dbPassword: '',
-            sshHost: '127.0.0.1',
-            sshPort: '22',
-            sshUsername: 'user',
-            sshPassword: '',
-            sshKeyFilePath: '',
-            socketPath: ''
-        }, data)
-    };
 
     export default {
 
@@ -172,7 +153,7 @@
 
         data() {
             return {
-                form: crateConnectionForm(),
+                form: Tab.createConnectionForm(),
                 busy: false,
                 testLoading: false,
                 saving: false,
@@ -185,10 +166,14 @@
                 let favorite = this.$store.getters['Favorite/getFavoriteById'](this.$route.params.id);
 
                 if(! favorite || ! favorite.id) {
-                    this.$router.push('/');
+                    this.$router.replace(`/${this.tab.id}/`);
+
+                    return;
                 }
 
-                this.form = crateConnectionForm(favorite);
+                this.tab.updateConnectionForm(favorite);
+            } else {
+                this.tab.updateConnectionForm({});
             }
         },
 
@@ -198,12 +183,36 @@
             ]),
 
             deleteFavorite() {
-                let id = this.id || this.$route.params.id;
+                let id = this.$route.params.id;
 
-                if(! id) {
+                if(! id || this.busy) {
                     return;
                 }
 
+                this.$confirm('This will permanently delete the favorite. Continue?', 'Warning', {
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    type: 'warning'
+                })
+                .then(() => {
+                   return this.$store.dispatch('Favorite/removeFavorite', id);
+                })
+                .then(res => {
+                    this.$router.replace(`/${this.tab.id}/`);
+
+                    this.$message({
+                        type: 'success',
+                        message: 'Delete completed',
+                        showClose: true
+                    });
+                })
+                .catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Delete canceled',
+                        showClose: true
+                    });
+                });
             },
 
             saveFavorite() {
@@ -214,13 +223,25 @@
                 this.saving = true;
                 this.busy = true;
 
-                this.$store.dispatch('Favorite/saveFavorite', this.form)
+                this.$store.dispatch('Favorite/saveFavorite', this.tab.connectionForm)
                     .then(favorite => {
                         this.saving = false;
                         this.busy = false;
 
+                        this.$message({
+                            type: 'success',
+                            message: 'Favorite saved',
+                            showClose: true
+                        });
+
                         if(this.newFavorite) {
-                            this.$router.push({name: 'favorite-single', params: {id: favorite.id}});
+                            this.$router.push({
+                                name: 'favorite-single',
+                                params: {
+                                    tabId: this.tab.id,
+                                    id: favorite.id
+                                }
+                            });
                         }
                     })
 
@@ -323,6 +344,12 @@
                 'allFavorites',
                 'currentFavorite'
             ]),
+
+            tab() {
+                return this.$store.getters['Tabs/getTabById'](
+                    parseInt(this.$route.params.tabId)
+                );
+            },
 
             isFavorite() {
                 return this.newFavorite || this.$route.params.id;

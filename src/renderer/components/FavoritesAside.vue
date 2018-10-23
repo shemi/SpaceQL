@@ -3,7 +3,7 @@
     <div class="connection-aside-container aside-container">
 
         <div class="aside-header-action">
-            <router-link :to="{name: 'quick-connection'}" class="aside-item icon-link">
+            <router-link :to="{name: 'quick-connection', params: {tabId}}" class="aside-item icon-link">
                 <span class="svg-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round" class="feather feather-zap"><polygon
@@ -18,7 +18,7 @@
                 <span>Favorites</span>
             </h3>
 
-            <router-link :to="{name: 'favorite'}">
+            <router-link :to="{name: 'favorite', params: {tabId}}">
                 <el-button icon="el-icon-plus" size="mini" circle></el-button>
             </router-link>
         </div>
@@ -27,7 +27,7 @@
             <div v-for="favorite in allFavorites"
                  :key="favorite.id"
                  class="aside-list-item">
-                <router-link :to="{name: 'favorite-single', params: {id: favorite.id}}" class="aside-item icon-link">
+                <router-link :to="{name: 'favorite-single', params: {tabId, id: favorite.id}}" class="aside-item icon-link">
                     <span class="svg-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" :fill="favorite.color" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></span>
                     <span>{{ favorite.name }}</span>
                 </router-link>
@@ -63,7 +63,10 @@
         computed: {
             ...mapGetters([
                 'allFavorites'
-            ])
+            ]),
+            tabId() {
+                return this.$route.params.tabId;
+            }
         }
 
     };

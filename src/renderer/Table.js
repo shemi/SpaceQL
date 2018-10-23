@@ -46,4 +46,8 @@ export default class Table {
         });
     }
 
+    tabId() {
+        return this.database.tabId();
+    }
+
 }

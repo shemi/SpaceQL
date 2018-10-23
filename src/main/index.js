@@ -4,7 +4,10 @@ import {
     ipcMain
 } from 'electron'
 
-import App from './App/App';
+import Service from './Service';
+import Tabs from './Tabs';
+import Router from './Router';
+import routes from './Controllers/index';
 
 /**
  * Set `__static` path to static files in production
@@ -15,6 +18,9 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow;
+let tabs;
+let router;
+let service;
 
 const winURL = process.env.NODE_ENV === 'development'
     ? `http://localhost:9080`
@@ -26,18 +32,28 @@ function createWindow() {
      */
     mainWindow = new BrowserWindow({
         height: 563,
-        useContentSize: true,
         width: 1000,
+        useContentSize: true,
+        show: false,
         frame: true
     });
+
+    service = new Service(ipcMain);
+    router = new Router(service);
+    tabs = Tabs.instance();
+    router.register(routes);
 
     mainWindow.loadURL(winURL);
 
     mainWindow.on('closed', () => {
+        tabs.closeAll();
+
         mainWindow = null
     });
 
-    new App(app, mainWindow, ipcMain);
+    mainWindow.on('ready-to-show', () => {
+        mainWindow.show();
+    });
 }
 
 app.on('ready', createWindow);

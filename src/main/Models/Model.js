@@ -1,4 +1,4 @@
-import Store from './Store';
+import Store from '../Store';
 import uuid from 'uuid/v4';
 import set from 'lodash/set';
 
@@ -42,11 +42,15 @@ class Model {
         store.set(this._getStoreKey(), this.data);
 
         if(! loaded[this.storeKey] || ! loaded[this.storeKey][this.id]) {
-            set(loaded, `${this.storeKey},${this.id}`, this);
+            set(loaded, `${this.storeKey}.${this.id}`, this);
         }
 
         this.isNew = false;
         this.isDerty = false;
+    }
+
+    remove() {
+        store.remove(this._getStoreKey());
     }
 
     _getStoreKey(id = null) {

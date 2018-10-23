@@ -10,3 +10,7 @@ export const COLORS = [
     {name: 'Turquoise', color: '#40E0D0'},
     {name: 'Deep Purple', color: '#a33fff'},
 ];
+
+export const TAB_CONNECTION_FORM = 1;
+export const TAB_SETTINGS = 2;
+export const TAB_CONNECTION = 2;

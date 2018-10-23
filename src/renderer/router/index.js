@@ -3,10 +3,15 @@ import Router from 'vue-router';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
     routes: [
         {
             path: '/',
+            name: 'newTab',
+            component: require('@/NewTab').default
+        },
+        {
+            path: '/:tabId',
             name: 'quick-connection',
             components: {
                 default: require('@/components/ConnectionForm').default,
@@ -17,7 +22,7 @@ export default new Router({
             },
         },
         {
-            path: '/favorites',
+            path: '/:tabId/favorites',
             name: 'favorite',
             components: {
                 default: require('@/components/ConnectionForm').default,
@@ -28,7 +33,7 @@ export default new Router({
             },
         },
         {
-            path: '/favorites/:id',
+            path: '/:tabId/favorites/:id',
             name: 'favorite-single',
             components: {
                 default: require('@/components/ConnectionForm').default,
@@ -39,7 +44,7 @@ export default new Router({
             },
         },
         {
-            path: '/tab/:id',
+            path: '/:tabId/connection/',
             name: 'tab',
             components: {
                 default: require('@/components/Connection').default,
@@ -65,4 +70,6 @@ export default new Router({
             redirect: '/'
         }
     ]
-})
+});
+
+export default router;

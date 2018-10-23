@@ -1,27 +1,35 @@
-import { ipcRenderer } from 'electron';
 import uuid from 'uuid/v4';
 
 class Service {
 
-    constructor(maxTimeoutMs = null) {
-        this.maxTimeoutMs = maxTimeoutMs;
+    constructor(ipc, timeOut = null) {
+        this.ipc = ipc;
+        this.maxTimeoutMs = timeOut;
     }
 
-    setMaxTimeoutMs(maxTimeoutMs) {
-        this.maxTimeoutMs = maxTimeoutMs;
+    on(route, listener) {
+        this.ipc.on(route, (event, replyChannel, ...dataArgs) => {
+            Promise.resolve().then(() => listener(...dataArgs))
+                .then((results) => {
+                    event.sender.send(replyChannel, 'success', results);
+                })
+                .catch((e) => {
+                    const message = e && e.message ? e.message : e;
+                    event.sender.send(replyChannel, 'failure', message);
 
-        return this;
+                    console.error(e);
+                });
+        });
     }
 
-    send(route, ...dataArgs) {
+    send(route, webContents, ...dataArgs) {
         return new Promise((resolve, reject) => {
             const replyChannel = `${route}#${uuid()}`;
             let timeout;
             let didTimeOut = false;
 
-            ipcRenderer.once(replyChannel, (event, status, returnData) => {
+            this.ipc.once(replyChannel, (event, status, returnData) => {
                 clearTimeout(timeout);
-
                 if (didTimeOut) {
                     return null;
                 }
@@ -30,15 +38,13 @@ class Service {
                     case 'success':
                         return resolve(returnData);
                     case 'failure':
-                        console.error(new Error(returnData));
-
                         return reject(new Error(returnData));
                     default:
                         return reject(new Error(`Unexpected IPC call status "${status}" in ${route}`));
                 }
             });
 
-            ipcRenderer.send(route, replyChannel, ...dataArgs);
+            webContents.send(route, replyChannel, ...dataArgs);
 
             if (this.maxTimeoutMs) {
                 timeout = setTimeout(() => {
@@ -49,20 +55,19 @@ class Service {
         });
     }
 
-    on(route, listener) {
-        ipcRenderer.on(route, (event, replyChannel, ...dataArgs) => {
-            Promise.resolve().then(() => listener(...dataArgs))
-                .then((results) => {
-                    ipcRenderer.sendTo(1, replyChannel, 'success', results);
-                })
-                .catch((e) => {
-                    const message = e && e.message ? e.message : e;
 
-                    ipcRenderer.sendTo(1, replyChannel, 'failure', message);
-                });
-        });
+    handelRequest(callback) {
+
+    }
+
+    responseSuccess(data) {
+
+    }
+
+    responseError(data) {
+
     }
 
 }
 
-export default (new Service());
+export default Service;

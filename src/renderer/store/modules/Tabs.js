@@ -55,6 +55,10 @@ const mutations = {
 
 const getters = {
     getTabById: (state) => (id) => {
+        if(! id) {
+            return null;
+        }
+
         return find(state.collection, {id});
     },
 
@@ -73,28 +77,17 @@ const getters = {
 
 const actions = {
 
-    create({ commit, state }, data) {
-        const tab = new Tab({
-            position: state.collection.length + 1,
-            ...data
-        });
-
-        const tabsWithTheSameName = filter(state.collection, {name: tab.name});
-
-        console.log(tabsWithTheSameName);
-
-        if(tabsWithTheSameName.length > 0) {
-            tab.setDuplications(tabsWithTheSameName.length + 1);
-        }
+    async create({ commit, state }, data) {
+        const tab = await Tab.create();
 
         commit('ADD', tab);
-        commit('SET', tab);
 
         return tab;
     },
 
     remove({ commit, state }, tab) {
         commit('REMOVE', tab);
+        tab.close();
     }
 
 };

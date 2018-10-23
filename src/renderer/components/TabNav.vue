@@ -29,8 +29,8 @@
                     <div class="el-tabs__nav is-top" ref="nav" :style="navStyle" role="tablist">
 
                         <div v-for="tab in tabs"
-                             class="el-tabs__item is-top is-closable"
-                             :class="{'is-active': tab.isActive, 'is-focus': isFocus}"
+                             class="el-tabs__item is-top"
+                             :class="{'is-active': tab.isActive, 'is-focus': isFocus, 'is-closable': tabs.length > 1}"
                              :id="tab.id"
                              role="tab"
                              :key="tab.id"
@@ -45,6 +45,7 @@
                             {{ tab.displayName() }}
 
                             <span class="el-icon-close"
+                                  v-if="tabs.length > 1"
                                   @click="closeTab(tab, $event)"></span>
                         </div>
 
@@ -157,7 +158,9 @@
 
             handleTabClick(tab, event) {
                 this.$store.commit('Tabs/SET', tab);
-                this.$router.replace(`/tab/${tab.id}`);
+                let route = tab.lastRoute || `/${tab.id}/`;
+
+                this.$router.replace(route);
 
                 this.$nextTick(() => {
                     setTimeout(() => {
@@ -171,12 +174,22 @@
 
                 const tabIndex = this.tabs.indexOf(tab);
 
-                if(tabIndex < 0) {
+                if(this.tabs.length <= 1) {
                     return;
                 }
 
-                if(this.tabs.length === 1) {
-                    this.handleTabAdd();
+                if(tab.isActive) {
+                    if(tabIndex === (this.tabs.length - 1)) {
+                        this.handleTabClick(this.tabs[tabIndex-1]);
+                    }
+
+                    else if(tabIndex < (this.tabs.length - 1)) {
+                        this.handleTabClick(this.tabs[tabIndex+1]);
+                    }
+
+                    else if(tabIndex === 0) {
+                        this.handleTabClick(this.tabs[0]);
+                    }
                 }
 
                 this.$store.dispatch('Tabs/remove', tab);
@@ -185,6 +198,12 @@
             handleTabAdd() {
                 this.$store.commit('Tabs/UNSET');
                 this.$router.replace('/');
+
+                this.$nextTick(() => {
+                    setTimeout(() => {
+                        this.scrollToActiveTab();
+                    }, 50);
+                });
             },
 
             update() {

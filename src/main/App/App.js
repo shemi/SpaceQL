@@ -1,18 +1,20 @@
 import * as events from '../../utils/main-events';
 import Service from './Service';
-import Favorite from './Favorite';
 import ConnectionController from "./Controllers/ConnectionController";
 import TableController from "./Controllers/TableController";
 import DatabaseController from "./Controllers/DatabaseController";
 import QueryController from "./Controllers/QueryController";
+import electron from "electron";
+
+let instance;
 
 class App {
 
-    constructor(electronApp, mainWindow, ipcMain) {
+    constructor(electronApp, ipcMain) {
         this.electronApp = electronApp;
-        this.mainWindow = mainWindow;
         this.ipc = ipcMain;
-        this.service = new Service(this.ipc);
+        this.service = Service;
+        this.connection = null;
 
         this.listenToRendererEvents();
     }
@@ -28,13 +30,19 @@ class App {
         this.service.on('QueryController@nextChunk', QueryController.call('nextChunk'));
         this.service.on('QueryController@deleteChunk', QueryController.call('deleteChunk'));
         this.service.on('QueryController@slowDown', QueryController.call('slowDown'));
-
-        //favorites
-        this.service.on(events.GET_ALL_FAVORITES, Favorite.getAllAndTransform);
-        this.service.on(events.SAVE_FAVORITE, Favorite.createUpdate);
     }
 
+    setConnection(connection) {
+        this.connection = connection;
+    }
 
+    static instance(electronApp = electron.remote.app, ipcMain = electron.ipcRenderer) {
+        if(! instance) {
+            instance = new App(electronApp, ipcMain);
+        }
+
+        return instance;
+    }
 
 }
 

@@ -1,6 +1,6 @@
 import find from 'lodash/find';
+import findIndex from 'lodash/findIndex';
 import Service from '../../Service';
-import {GET_ALL_FAVORITES, SAVE_FAVORITE} from "../../../utils/main-events";
 
 const state = {
     current: null,
@@ -34,6 +34,16 @@ const mutations = {
         }
     },
 
+    DELETE(state, id) {
+        let index = findIndex(state.collection, {id});
+
+        if(index < 0) {
+            return;
+        }
+
+        state.collection.splice(index, 1);
+    },
+
     PUSH_TO_COLLECTION(state, favorite) {
         state.collection.push(favorite);
     }
@@ -55,7 +65,7 @@ const getters = {
 
 const actions = {
     loadFavorites({ commit }) {
-        Service.send(GET_ALL_FAVORITES)
+        Service.send('FavoritesController@all')
             .then(favorites => {
 
                 for(let favorite of favorites) {
@@ -66,12 +76,20 @@ const actions = {
 
     saveFavorite({ commit }, form) {
         return new Promise((resolve, reject) => {
-            Service.send(SAVE_FAVORITE, form)
+            Service.send('FavoritesController@createUpdate', form)
                 .then(favorite => {
                     commit('ADD_UPDATE_COLLECTION', favorite);
                     resolve(favorite);
                 });
         });
+    },
+
+    removeFavorite({ commit }, id) {
+        console.log(id);
+
+        commit('DELETE', id);
+
+        return Service.send('FavoritesController@destroy', id);
     }
 
 };

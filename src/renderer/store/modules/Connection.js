@@ -66,11 +66,6 @@ const actions = {
                     const connection = new Connection(data.connection, connectionForm);
 
                     commit('ADD_UPDATE_COLLECTION', connection);
-
-                    return dispatch('Tabs/create', {
-                        connection,
-                        favorite: data.favorite,
-                    }, {root:true});
                 })
                 .then(tab => {
                     resolve(tab);

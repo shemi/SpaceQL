@@ -1,6 +1,7 @@
 import Controller from "./Controller";
 import Connection from '../Connection';
-import Favorite from "../Favorite";
+import Favorite from "../../Models/Favorite";
+import App from "../App";
 
 class ConnectionController extends Controller {
 
@@ -24,6 +25,8 @@ class ConnectionController extends Controller {
             connection.connect()
                 .then(conn => conn.initData())
                 .then(conn => {
+                    App.instance().setConnection(connection);
+
                     resolve(this.response({
                         connection: conn.toRenderer(),
                         favorite: favorite ? favorite.toRenderer() : {}
@@ -35,8 +38,8 @@ class ConnectionController extends Controller {
         });
     }
 
-    disconnect(connectionId) {
-        const connection = Connection.getConnection(connectionId);
+    disconnect() {
+        const connection = App.instance().connection;
 
         if(! connection) {
             return false;

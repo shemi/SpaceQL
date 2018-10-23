@@ -1,11 +1,7 @@
 import * as connectors from './Connections';
 import * as drivers from './Drivers';
-import uuid from 'uuid/v4';
-import Favorite from "./Favorite";
 import DatabasesCollection from './DatabasesCollection';
 import Database from "./Database";
-
-const connections = {};
 
 export default class Connection {
 
@@ -17,7 +13,6 @@ export default class Connection {
         this._driver = driver;
         this._config = config;
         this._dbConfig = dbConfig;
-        this.id = uuid();
 
         const Connector = connectors[this._type],
             Driver = drivers[this._driver];
@@ -47,7 +42,6 @@ export default class Connection {
             this.driver = await this._connection.connect();
             this.databases.setDriver(this.driver);
             this.systemDatabases.setDriver(this.driver);
-            connections[this.id] = this;
         } catch (e) {
             throw e;
         }
@@ -109,13 +103,8 @@ export default class Connection {
         return this;
     }
 
-    static getConnection(id) {
-        return connections[id];
-    }
-
     toRenderer() {
         return {
-            id: this.id,
             name: this._dbConfig.user+'@'+this._dbConfig.host+':'+this._dbConfig.port,
             version: this.version,
             databases: this.databases.toRenderer(),

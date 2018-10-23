@@ -21,6 +21,7 @@ export default class Connection {
         this.log = [];
         this.version = version.version;
         this.fullVersion = version.fullVersion;
+        this.tab = null;
     }
 
     getFirstDatabaseToSelect() {
@@ -38,6 +39,20 @@ export default class Connection {
 
     select(name) {
         this.selectedDatabase = this.databases.find({name});
+    }
+
+    setTab(tab) {
+        this.tab = tab;
+
+        return this;
+    }
+
+    tabId() {
+        if(! this.tab) {
+            return null;
+        }
+
+        return this.tab.id;
     }
 
 }

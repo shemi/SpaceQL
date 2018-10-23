@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "author": "shemi perez <shemi.perez@gmail.com>",
   "description": "An electron-vue project",
-  "license": null,
+  "license": "(ISC OR GPL-3.0)",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js",
@@ -42,6 +42,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@babel/preset-stage-3": "^7.0.0",
     "ajv": "^6.5.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
