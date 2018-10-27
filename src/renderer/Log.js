@@ -2,6 +2,7 @@ import {LOG_TYPE_ERROR, LOG_TYPE_INFO, LOG_TYPE_WARNING} from "../utils/constant
 import SqlError from "../utils/Exceptions/SqlError";
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
+import trim from 'lodash/trim';
 
 const moment = extendMoment(Moment);
 
@@ -60,9 +61,12 @@ class InfoLog extends LogMessage {
         this.endTime = null;
         this.affectedRows = null;
         this.changedRows = null;
+        this.insertId = null;
         this.rowsCount = null;
-        this.sqlQery = '';
+        this.sqlString = '';
         this.range = null;
+        this.statementType = '';
+        this.table = '';
 
         if(typeof message === 'object') {
             if(message.time && message.time.start) {
@@ -75,8 +79,6 @@ class InfoLog extends LogMessage {
 
             if(this.startTime && this.endTime) {
                 this.range = moment.range(this.startTime, this.endTime);
-                console.log('got '+ message.rowsCount + ' rows in ' + this.range.diff('seconds', true) + ' Seconds');
-                console.dir(this.range);
             }
 
             if(message.affectedRows || parseInt(message.affectedRows) === 0) {
@@ -87,17 +89,82 @@ class InfoLog extends LogMessage {
                 this.changedRows = parseInt(message.changedRows);
             }
 
+            if(message.insertId) {
+                this.insertId = message.insertId;
+            }
+
             if(message.rowsCount || parseInt(message.rowsCount) === 0) {
                 this.rowsCount = parseInt(message.rowsCount);
             }
 
-            if(message.sqlQery) {
-                this.sqlQery = message.sqlQery;
+            if(message.sqlString) {
+                this.sqlString = message.sqlString;
             }
 
+            if(message.statementType) {
+                this.statementType = message.statementType;
+            }
+
+            if(message.table) {
+                this.table = message.table;
+            }
         }
 
+        this.craftMessage();
     }
+
+    craftMessage() {
+        let message = '';
+
+        switch (this.statementType) {
+            case 'select':
+                message += `${this.rowsCount || 0} row(s) returned`;
+                break;
+
+            case 'insert':
+                message += `${this.affectedRows || 0} row(s) inserted`;
+
+                if(this.insertId) {
+                    message += `, Insert ID: ${this.insertId}`;
+                }
+
+                break;
+
+            case 'delete':
+                message += `${this.affectedRows || 0} row(s) deleted`;
+                break;
+
+            case 'update':
+                message += `${this.changedRows || 0} row(s) updated`;
+                break;
+
+            default:
+                if(this.rowsCount >= 0) {
+                    message += `${this.rowsCount} row(s) returned; `;
+                }
+
+                if(this.affectedRows >= 0) {
+                    message += `${this.affectedRows} row(s) affected; `;
+                }
+
+                if(this.insertId) {
+                    message += `Insert ID: ${this.insertId}; `;
+                }
+
+                if(this.changedRows >= 0) {
+                    message += `${this.changedRows} row(s) changed; `;
+                }
+
+                message = trim(message, '; ');
+        }
+
+        if(this.range) {
+            message += ` in ${this.range.diff('seconds', true)} Seconds`;
+        }
+
+        this.message = message;
+    }
+
 }
 
 class WarningLog extends LogMessage {

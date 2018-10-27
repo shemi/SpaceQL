@@ -2,6 +2,8 @@ import Driver from './Driver';
 import mysql from 'mysql2/promise';
 import QueryBuilder from "./QueryBuilder";
 import MySqlGrammar from "./Grammars/MySqlGrammar";
+import { Crud } from 'mysql-crud-parser';
+import ResultSet from "./ResultSet";
 
 class MysqlDriver extends Driver {
 
@@ -86,6 +88,9 @@ class MysqlDriver extends Driver {
             values = grammar.values;
         }
 
+        let crud = new Crud(sql);
+        // crud.statements
+
         return new Promise((resolve, reject) => {
             this.getConnection()
                 .then(connection => connection.query(sql, values))
@@ -94,6 +99,38 @@ class MysqlDriver extends Driver {
                 })
                 .catch(e => reject(e));
         });
+    }
+
+    async tempQuery(sql, values = []) {
+        if(sql instanceof QueryBuilder) {
+            let grammar = new MySqlGrammar;
+            sql = grammar.compileSelect(sql);
+            values = grammar.values;
+        }
+
+        let crud = new Crud(sql),
+            connection = await this.getConnection(),
+            sets = [],
+            statement;
+
+        // select * from users;
+        // delete from users where id = 301
+
+        for(statement of crud.statements) {
+            let queryString = statement.toString();
+            let resultSet = new ResultSet(statement);
+            let [rows, columns] = await connection.query(queryString, values);
+
+            if(Array.isArray(rows) && columns) {
+                resultSet.setRows(rows, columns);
+            } else {
+                resultSet.closeHead(rows);
+            }
+
+            sets.push(resultSet);
+        }
+
+        return sets;
     }
 
     async getVersion(full = false, refresh = false) {

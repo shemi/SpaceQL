@@ -1,5 +1,5 @@
 import TablesCollection from './TablesCollection';
-import RowsChunks from './RowsChunks';
+import RowsChunks from './Drivers/RowsChunks';
 import moment from 'moment';
 import ResultSetHeader from "./ResultSetHeader";
 
@@ -56,8 +56,11 @@ export default class Database {
 
         return new Promise((resolve, reject) => {
             this.connection.use(this.name)
-                .then(db => db.query(query))
-                .then(([rowsSets, columnsSets]) => {
+                .then(db => db.tempQuery(query))
+                .then(results => {
+                    resolve(results.map((set) => set.toJSON()));
+                    return;
+
                     let infoSets = [];
                     let sets = [];
 

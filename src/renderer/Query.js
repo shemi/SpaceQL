@@ -26,6 +26,9 @@ class QueryResultSet {
             .then(rows => {
                 if(! rows || ! Array.isArray(rows)) {
                     this.hasMoreRows = false;
+                    this.loadingMore = false;
+
+                    return;
                 }
 
                 for(let row of rows) {
@@ -62,11 +65,25 @@ export default class Query {
         let sets = [];
 
         try {
-            let results = await Service.sendTo(this.tabId, 'QueryController@exec', this.database.name, sql);
-            sets = results.sets;
+            let results = await Service.sendTo(this.tabId, 'QueryController@exec', this.database.name, sql),
+                set,
+                resultSetsIndex = 0;
 
-            for(let data of results.infoSets) {
-                this.tab.log.info(data, this.database.name);
+            for(let set of results) {
+                this.tab.log.info(set.head, this.database.name);
+
+                if(set.columns && set.columns.length > 0) {
+                    this.resultsSets.push(new QueryResultSet(
+                        this.tabId,
+                        set.rows,
+                        set.columns,
+                        set.chunkId,
+                        set.head.rowsCount,
+                        resultSetsIndex
+                    ));
+
+                    resultSetsIndex++;
+                }
             }
 
         }
@@ -74,9 +91,6 @@ export default class Query {
             this.tab.log.error(e, this.database.name);
         }
 
-        for(let set of sets) {
-            this.resultsSets.push(new QueryResultSet(this.tabId, ...set));
-        }
 
         return Vue.nextTick();
     }

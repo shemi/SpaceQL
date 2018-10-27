@@ -103,6 +103,8 @@ class Service {
                     error = new Error(returnData.message);
                 }
 
+                console.log(returnData);
+
                 return reject(error);
             default:
                 return reject(new Error(`Unexpected IPC call status "${status}" in ${route}`));

@@ -56,11 +56,32 @@ class Service {
                     this.ipc.sendTo(1, replyChannel, 'success', results);
                 })
                 .catch((e) => {
-                    console.dir(e);
+                    console.dir(this.extractError(e));
 
-                    this.ipc.sendTo(1, replyChannel, 'failure', e);
+                    this.ipc.sendTo(1, replyChannel, 'failure', this.extractError(e));
                 });
         });
+    }
+
+    extractError(error) {
+        if(! (error instanceof Error)) {
+            if(typeof error === 'object') {
+                return error;
+            }
+
+            if(typeof error === 'string') {
+                return {message: error};
+            }
+        }
+
+        let object = {};
+
+        Object.getOwnPropertyNames(error)
+            .forEach((key) => {
+                object[key] = error[key];
+            }, error);
+
+        return object;
     }
 
 }

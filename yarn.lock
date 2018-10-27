@@ -4661,6 +4661,10 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
+mysql-crud-parser@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/mysql-crud-parser/-/mysql-crud-parser-0.1.1.tgz#9bc87d45d818ae293aa73b2e038b67a847caabf7"
+
 mysql2@^1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/mysql2/-/mysql2-1.6.1.tgz#9027fd93a05c5d86e79bfada35c9b677b3a0d7c5"
@@ -4825,6 +4829,10 @@ node-pre-gyp@^0.10.0:
     semver "^5.3.0"
     tar "^4"
 
+node-query@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/node-query/-/node-query-0.3.3.tgz#b3e3d757fef2e2801d52cd3d4798a455f01ae4ab"
+
 node-sass@^4.9.2:
   version "4.9.3"
   resolved "https://registry.yarnpkg.com/node-sass/-/node-sass-4.9.3.tgz#f407cf3d66f78308bb1e346b24fa428703196224"
@@ -4848,6 +4856,10 @@ node-sass@^4.9.2:
     sass-graph "^2.2.4"
     stdout-stream "^1.4.0"
     "true-case-path" "^1.0.2"
+
+node-sqlparser@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/node-sqlparser/-/node-sqlparser-1.0.4.tgz#1b97bef90f5ad7276de709c5c0bd3f47582049a7"
 
 nodeify@^1.0.1:
   version "1.0.1"

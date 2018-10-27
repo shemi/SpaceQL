@@ -1,5 +1,5 @@
 import Controller from "./Controller";
-import RowsChunks from '../RowsChunks';
+import RowsChunks from '../Drivers/RowsChunks';
 
 class QueryController extends Controller {
 

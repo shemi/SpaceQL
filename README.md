@@ -1,4 +1,4 @@
-# sonarr-pro
+# SpaceQL
 
 > An electron-vue project
 

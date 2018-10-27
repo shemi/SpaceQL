@@ -33,7 +33,7 @@
     import Service from "./Service";
 
     export default {
-        name: "sonarr-pro",
+        name: "SpaceQL",
 
         created() {
             Service.send('TabsController@closeAll');

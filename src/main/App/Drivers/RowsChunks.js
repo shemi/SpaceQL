@@ -11,32 +11,20 @@ class RowsChunks {
 
     create(rows) {
         const id = uuid();
-        const rowsChunks = chunk(rows, RowsChunks.chunkSize);
 
-        this.chunks[id] = {
-            rows: rowsChunks,
-            current: 0
-        };
+        this.chunks[id] = chunk(rows, RowsChunks.chunkSize);
 
-        return {rows: rowsChunks[0], id};
+        rows = this.next(id);
+
+        return {rows, id};
     }
 
     next(id) {
-        const chunk = this.chunks[id];
-
-        if(! chunk || ! chunk.rows) {
+        if(! this.chunks[id] || this.chunks[id].length <= 0) {
             return false;
         }
 
-        let nextIndex = chunk.current + 1;
-
-        if(chunk.rows.length < nextIndex) {
-            return false;
-        }
-
-        chunk.current = nextIndex;
-
-        return chunk.rows[nextIndex];
+        return this.chunks[id].shift();
     }
 
     clear(id) {
