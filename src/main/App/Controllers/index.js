@@ -1,25 +1,27 @@
 const files = require.context('.', false, /\.js$/);
-const controllers = [];
+let controllers = [];
 
 files.keys().forEach(key => {
-  if (key === './index.js') {
-      return;
-  }
+    if (key === './index.js' || key === './Controller.js') {
+        return;
+    }
 
-  let actions = {},
-      controller = files(key).default;
+    let actions = {},
+        controller = files(key).default;
 
+    if(! controller.actions || controller.actions.length <= 0) {
+        return;
+    }
 
+    for(let action of controller.actions) {
+        actions[action] = controller.call(action);
+    }
 
-  controllers.push({
-      namespace: key.replace(/(\.\/|\.js)/g, ''),
-      actions: {},
-  });
+    controllers.push({
+        controller: key.replace(/(\.\/|\.js)/g, ''),
+        actions: actions,
+    });
 
-  modules[key.replace(/(\.\/|\.js)/g, '')] = {
-      namespaced: true,
-      ...files(key).default
-  }
 });
 
 export default controllers;

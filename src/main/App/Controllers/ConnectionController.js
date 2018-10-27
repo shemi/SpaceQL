@@ -1,11 +1,19 @@
 import Controller from "./Controller";
 import Connection from '../Connection';
-import Favorite from "../../Models/Favorite";
-import App from "../App";
 
 class ConnectionController extends Controller {
 
+    get actions() {
+        return [
+            'test',
+            'connect',
+            'disconnect'
+        ];
+    }
+
     async test(connectionForm) {
+        console.log('testing');
+
         const connection = new Connection(
             this.transformConnectionForm(connectionForm)
         );
@@ -14,9 +22,6 @@ class ConnectionController extends Controller {
     }
 
     connect(connectionForm) {
-        const favoriteId = connectionForm.id,
-            favorite = favoriteId ? Favorite.get(favoriteId) : null;
-
         return new Promise((resolve, reject) => {
             const connection = new Connection(
                 this.transformConnectionForm(connectionForm)
@@ -25,12 +30,9 @@ class ConnectionController extends Controller {
             connection.connect()
                 .then(conn => conn.initData())
                 .then(conn => {
-                    App.instance().setConnection(connection);
+                    this.app.setConnection(conn);
 
-                    resolve(this.response({
-                        connection: conn.toRenderer(),
-                        favorite: favorite ? favorite.toRenderer() : {}
-                    }));
+                    resolve(this.response(conn.toRenderer()));
                 })
                 .catch(err => {
                     reject(err);
@@ -39,13 +41,11 @@ class ConnectionController extends Controller {
     }
 
     disconnect() {
-        const connection = App.instance().connection;
-
-        if(! connection) {
-            return false;
+        if(! this.connection) {
+            return this.response(false);
         }
 
-        connection.disconnect();
+        return this.response(this.connection.disconnect());
     }
 
     transformConnectionForm(form) {

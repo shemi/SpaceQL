@@ -7,7 +7,8 @@ class FavoritesController extends Controller {
         return [
             'all',
             'createUpdate',
-            'destroy'
+            'destroy',
+            'find'
         ];
     }
 
@@ -16,6 +17,16 @@ class FavoritesController extends Controller {
             Favorite.all()
                 .map(favorite => favorite.toCollection())
         );
+    }
+
+    find(id) {
+        const favorite = Favorite.get(id);
+
+        if(! favorite) {
+            return this.response(null);
+        }
+
+        return this.response(favorite.toCollection());
     }
 
     createUpdate(form) {

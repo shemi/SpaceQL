@@ -19,14 +19,45 @@ export default class Database {
         this.connection = connection;
 
         this.query = new Query(this);
+
+        this.loadingTables = false;
     }
 
-    connectionId() {
-        return this.connection.id;
+    selectFirstTable() {
+        if(! this.tablesLoaded) {
+            return;
+        }
+
+        this.selectedTable = this.tables.first();
     }
 
-    tabId() {
-        return this.connection.tabId();
+    async loadTables(refresh = false) {
+        if(this.tablesLoaded && ! refresh) {
+            return this;
+        }
+
+        this.loadingTables = true;
+
+        if(refresh) {
+            this.tablesLoaded = false;
+            this.tables.deleteAll();
+        }
+
+        const tables = await Service.sendTo(this.tabId, 'DatabaseController@tables', this.name);
+
+        this.tables.collect(tables);
+        this.tablesLoaded = true;
+        this.loadingTables = false;
+
+        return this;
+    }
+
+    get tab() {
+        return this.connection.tab;
+    }
+
+    get tabId() {
+        return this.connection.tabId;
     }
 
 }

@@ -1,9 +1,9 @@
-import { ipcRenderer } from 'electron';
 import uuid from 'uuid/v4';
 
 class Service {
 
-    constructor(maxTimeoutMs = null) {
+    constructor(ipc, maxTimeoutMs = null) {
+        this.ipc = ipc;
         this.maxTimeoutMs = maxTimeoutMs;
     }
 
@@ -19,7 +19,7 @@ class Service {
             let timeout;
             let didTimeOut = false;
 
-            ipcRenderer.once(replyChannel, (event, status, returnData) => {
+            this.ipc.once(replyChannel, (event, status, returnData) => {
                 clearTimeout(timeout);
 
                 if (didTimeOut) {
@@ -30,15 +30,13 @@ class Service {
                     case 'success':
                         return resolve(returnData);
                     case 'failure':
-                        console.error(new Error(returnData));
-
                         return reject(new Error(returnData));
                     default:
                         return reject(new Error(`Unexpected IPC call status "${status}" in ${route}`));
                 }
             });
 
-            ipcRenderer.send(route, replyChannel, ...dataArgs);
+            this.ipc.send(route, replyChannel, ...dataArgs);
 
             if (this.maxTimeoutMs) {
                 timeout = setTimeout(() => {
@@ -50,19 +48,21 @@ class Service {
     }
 
     on(route, listener) {
-        ipcRenderer.on(route, (event, replyChannel, ...dataArgs) => {
+        console.log(route);
+        this.ipc.on(route, (event, replyChannel, ...dataArgs) => {
+            console.log('call: ' + route);
             Promise.resolve().then(() => listener(...dataArgs))
                 .then((results) => {
-                    ipcRenderer.sendTo(1, replyChannel, 'success', results);
+                    this.ipc.sendTo(1, replyChannel, 'success', results);
                 })
                 .catch((e) => {
-                    const message = e && e.message ? e.message : e;
+                    console.dir(e);
 
-                    ipcRenderer.sendTo(1, replyChannel, 'failure', message);
+                    this.ipc.sendTo(1, replyChannel, 'failure', e);
                 });
         });
     }
 
 }
 
-export default (new Service());
+export default Service;

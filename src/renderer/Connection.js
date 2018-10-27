@@ -6,14 +6,15 @@ export default class Connection {
     constructor(rawConnection, originalForm = {}) {
 
         let {
-            id, name,
+            name,
             databases, privileges,
             version
         } = rawConnection;
 
+        console.log(rawConnection, originalForm);
+
         this.form = originalForm;
 
-        this.id = id;
         this.name = name;
         this.databases = new DatabasesCollection(databases || [], this);
         this.selectedDatabase = this.getFirstDatabaseToSelect();
@@ -25,7 +26,6 @@ export default class Connection {
     }
 
     getFirstDatabaseToSelect() {
-        console.log(this.form);
         if(this.form.dbName) {
             let database = this.databases.find({name: this.form.dbName});
 
@@ -39,6 +39,15 @@ export default class Connection {
 
     select(name) {
         this.selectedDatabase = this.databases.find({name});
+
+        if(! this.selectedDatabase) {
+            return;
+        }
+
+        this.selectedDatabase.loadTables()
+            .catch(err => {
+                console.error(err);
+            });
     }
 
     setTab(tab) {
@@ -47,12 +56,25 @@ export default class Connection {
         return this;
     }
 
-    tabId() {
+    get tabId() {
         if(! this.tab) {
             return null;
         }
 
         return this.tab.id;
+    }
+
+    static async connect(connectionForm, tab) {
+        const rawConnection = await Service.sendTo(tab.id, 'ConnectionController@connect', connectionForm),
+            inst = new Connection(rawConnection, connectionForm);
+
+        inst.setTab(tab);
+
+        return inst;
+    }
+
+    static async test(connectionForm, tab) {
+        return await Service.sendTo(tab.id, 'ConnectionController@test', connectionForm);
     }
 
 }

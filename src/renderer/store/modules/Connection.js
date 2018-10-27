@@ -52,29 +52,13 @@ const getters = {
     allConnections(state) {
         return state.collection;
     },
+
     currentConnection(state) {
         return state.current;
     }
 };
 
 const actions = {
-
-    connect({ commit, dispatch }, connectionForm) {
-        return new Promise((resolve, reject) => {
-            Service.send(CONNECT, connectionForm)
-                .then(data => {
-                    const connection = new Connection(data.connection, connectionForm);
-
-                    commit('ADD_UPDATE_COLLECTION', connection);
-                })
-                .then(tab => {
-                    resolve(tab);
-                })
-                .catch(err => {
-                    reject(err);
-                })
-        });
-    }
 
 };
 

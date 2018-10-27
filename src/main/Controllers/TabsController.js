@@ -6,7 +6,9 @@ class TabsController extends Controller {
     get actions() {
         return [
             'create',
-            'close'
+            'close',
+
+            'closeAll'
         ];
     }
 
@@ -19,6 +21,12 @@ class TabsController extends Controller {
     close(id) {
         Tabs.instance()
             .close(id);
+
+        return this.response(true);
+    }
+
+    closeAll() {
+        Tabs.instance().closeAll();
 
         return this.response(true);
     }

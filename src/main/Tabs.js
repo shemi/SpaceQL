@@ -15,7 +15,9 @@ class Tabs {
     create() {
         return new Promise((resolve, reject) => {
             const tab = new BrowserWindow({show: false});
-            const tabId = tab.id;
+            const tabId = tab.webContents.id;
+
+            console.log(tabId);
 
             tab.loadURL(winURL);
             this.tabs[tabId] = tab;

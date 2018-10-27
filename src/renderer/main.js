@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import axios from 'axios';
+import moment from 'moment';
+import 'moment-precise-range-plugin';
 import Element from 'element-ui';
 
 import App from './App';

@@ -14,3 +14,21 @@ export const COLORS = [
 export const TAB_CONNECTION_FORM = 1;
 export const TAB_SETTINGS = 2;
 export const TAB_CONNECTION = 2;
+
+export const BUILDER_OPRATORS = [
+    '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
+    'like', 'like binary', 'not like', 'ilike',
+    '&', '|', '^', '<<', '>>',
+    'rlike', 'regexp', 'not regexp',
+    '~', '~*', '!~', '!~*', 'similar to',
+    'not similar to', 'not ilike', '~~*', '!~~*'
+];
+
+export const QUERY_OPRATORS = [
+    '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
+    'like', 'not like'
+];
+
+export const LOG_TYPE_INFO = 'info';
+export const LOG_TYPE_ERROR = 'error';
+export const LOG_TYPE_WARNING = 'warning';

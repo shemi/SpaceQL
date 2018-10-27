@@ -1,5 +1,7 @@
 import TablesCollection from './TablesCollection';
 import RowsChunks from './RowsChunks';
+import moment from 'moment';
+import ResultSetHeader from "./ResultSetHeader";
 
 export default class Database {
 
@@ -40,10 +42,9 @@ export default class Database {
         const builder = db.builder()
             .table(tableName)
             .take(limit);
-        
 
-        if(query && query.value) {
-
+        if(query && query.value && query.column) {
+            builder.where(query.column, query.operator, query.value);
         }
 
         return await builder.get();
@@ -51,15 +52,33 @@ export default class Database {
 
     query(query) {
         const chunkSize = RowsChunks.getRowsPerChunk();
+        const startTime = moment();
 
         return new Promise((resolve, reject) => {
             this.connection.use(this.name)
                 .then(db => db.query(query))
                 .then(([rowsSets, columnsSets]) => {
-                    rowsSets = (! Array.isArray(rowsSets[0])) ? [rowsSets] : rowsSets;
-                    columnsSets = (! Array.isArray(columnsSets[0])) ? [columnsSets] : columnsSets;
-
+                    let infoSets = [];
                     let sets = [];
+
+                    if(! columnsSets) {
+                        let infoData = Array.isArray(rowsSets) ? rowsSets : [rowsSets],
+                            data;
+
+                        for(data of infoData) {
+                            infoSets.push(
+                                ResultSetHeader
+                                    .createAndClose(startTime, data)
+                                    .toJson()
+                            );
+                        }
+
+                        columnsSets = [];
+                        rowsSets = [];
+                    } else {
+                        rowsSets = (! Array.isArray(rowsSets[0])) ? [rowsSets] : rowsSets;
+                        columnsSets = (! Array.isArray(columnsSets[0])) ? [columnsSets] : columnsSets;
+                    }
 
                     for(let setIndex in rowsSets) {
                         let rows = rowsSets[setIndex];
@@ -74,10 +93,16 @@ export default class Database {
                             chunksId = chunk.id;
                         }
 
+                        infoSets.push(
+                            ResultSetHeader
+                                .createAndClose(startTime, {rowsCount: total})
+                                .toJson()
+                        );
+
                         sets.push([rows, columns, chunksId, total, setIndex]);
                     }
 
-                    resolve(sets);
+                    resolve({sets, infoSets});
                 })
                 .catch(err => reject(err));
         });

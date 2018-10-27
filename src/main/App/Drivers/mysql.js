@@ -81,7 +81,9 @@ class MysqlDriver extends Driver {
 
     async query(sql, values = [], release = true) {
         if(sql instanceof QueryBuilder) {
-            sql = (new MySqlGrammar).compileSelect(sql);
+            let grammar = new MySqlGrammar;
+            sql = grammar.compileSelect(sql);
+            values = grammar.values;
         }
 
         return new Promise((resolve, reject) => {

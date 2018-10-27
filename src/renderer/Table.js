@@ -26,28 +26,47 @@ export default class Table {
         this.content = new Collection([], this);
 
         this.database = database;
+
+        this.lastQuery = null;
     }
 
-    getContent(query = {}, order = {}, limit = 100) {
+    async getContent(query = {}, order = {}, limit = 100, refresh = false) {
+        let tokenizeParams = JSON.stringify([query, order, limit]);
+
+        if(tokenizeParams === this.lastQuery && ! refresh) {
+            return this;
+        }
+
+        this.lastQuery = tokenizeParams;
         this.columns.deleteAll();
         this.content.deleteAll();
 
-        return new Promise((resolve, reject) => {
-            Service.send('TableController@content', this.database.connection.id, this.database.name, this.name, query, order, limit)
-                .then(({rows, columns}) => {
-                    this.content.merge(rows);
-                    this.columns.merge(columns);
+        let {rows, columns} = await Service.sendTo(
+            this.tabId,
+            'TableController@content',
+            this.database.name,
+            this.name,
+            query,
+            order,
+            limit
+        );
 
-                    resolve(this);
-                })
-                .catch(err => {
-                    reject(err);
-                });
-        });
+        this.content.merge(rows);
+        this.columns.merge(columns);
+
+        return this;
     }
 
-    tabId() {
-        return this.database.tabId();
+    refreshContent() {
+        if(! this.lastQuery) {
+            return this;
+        }
+
+        return this.getContent(...JSON.parse(this.lastQuery), true);
+    }
+
+    get tabId() {
+        return this.database.tabId;
     }
 
 }

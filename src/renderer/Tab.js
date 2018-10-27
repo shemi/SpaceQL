@@ -1,7 +1,8 @@
 import uuid from 'uuid/v4';
 import Service from "./Service";
 import Connection from './Connection';
-import {TAB_CONNECTION_FORM} from "../utils/constants";
+import {TAB_CONNECTION, TAB_CONNECTION_FORM} from "../utils/constants";
+import Log from "./Log";
 
 export default class Tab {
 
@@ -18,6 +19,7 @@ export default class Tab {
         this.hasConnection = false;
         this.type = TAB_CONNECTION_FORM;
         this.lastRoute = null;
+        this.log = new Log();
 
         this.nameDuplication = 0;
         this.connectionForm = Tab.createConnectionForm();
@@ -72,6 +74,28 @@ export default class Tab {
         const id = await Service.send('TabsController@create');
 
         return new Tab(id);
+    }
+
+    async test() {
+        return await Connection.test(this.connectionForm, this);
+    }
+
+    async connect() {
+        this.connection = await Connection.connect(this.connectionForm, this);
+        this.hasConnection = true;
+        this.type = TAB_CONNECTION;
+
+        if(this.connectionForm.id) {
+            const favorite = await Service.send('FavoritesController@find', this.connectionForm.id);
+
+            if(favorite) {
+                this.favorite = favorite;
+                this.name = favorite.name;
+                this.color = favorite.color;
+            }
+        }
+
+        return await this.connection;
     }
 
     activate() {

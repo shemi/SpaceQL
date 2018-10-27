@@ -120,11 +120,6 @@
             </el-button>
         </div>
 
-        <button type="button"
-                @click="testSlowDown">
-            slow down
-        </button>
-
     </div>
 
 </template>
@@ -255,7 +250,7 @@
                 this.busy = true;
                 this.testLoading = true;
 
-                service.send(TEST_CONNECTION, this.form)
+                this.tab.test()
                     .then(res => {
                         this.busy = false;
                         this.testLoading = false;
@@ -293,10 +288,11 @@
 
                 this.busy = true;
 
-                this.$store.dispatch('Connection/connect', this.form)
-                    .then(tab => {
+                this.tab.connect()
+                    .then(connection => {
+                        console.log('done connecting');
                         this.busy = false;
-                        this.$router.push(`/tab/${tab.id}`);
+                        this.$router.replace(`/${this.tab.id}/connection/query`);
                     })
                     .catch(err => {
                         this.busy = false;
@@ -329,13 +325,6 @@
                         this.$set(this.form, formKey, filePaths[0]);
                     }
                 );
-            },
-
-            testSlowDown() {
-                service.send('QueryController@slowDown')
-                    .then(res => {
-                        console.log(res);
-                    });
             }
         },
 

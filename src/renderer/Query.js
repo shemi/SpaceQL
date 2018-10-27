@@ -3,14 +3,14 @@ import Vue from 'vue';
 
 class QueryResultSet {
 
-    constructor(rows, columns, chunkId, total, index) {
+    constructor(tabId, rows, columns, chunkId, total, index) {
         this.rows = rows || [];
         this.columns = columns || [];
         this.chunkId = chunkId;
         this.total = total;
         this.hasMoreRows = !! chunkId;
         this.index = index;
-        this.selectedTab = '0';
+        this.tabId = tabId;
 
         this.loadingMore = false;
     }
@@ -22,7 +22,7 @@ class QueryResultSet {
 
         this.loadingMore = true;
 
-        Service.send('QueryController@nextChunk', this.chunkId)
+        Service.sendTo(this.tabId, 'QueryController@nextChunk', this.chunkId)
             .then(rows => {
                 if(! rows || ! Array.isArray(rows)) {
                     this.hasMoreRows = false;
@@ -49,7 +49,7 @@ export default class Query {
         this.lastSql = '';
     }
 
-    exec(sql) {
+    async exec(sql) {
         this.lastSql = sql.trim();
 
         if(this.append) {
@@ -59,18 +59,26 @@ export default class Query {
             this.sqlHistory.length = 0;
         }
 
+        let sets = [];
 
-        return Service.send('QueryController@exec', this.database.connectionId(), this.database.name, sql)
-            .then((sets) => {
-                for(let set of sets) {
-                    this.resultsSets.push(new QueryResultSet(...set));
-                }
+        try {
+            let results = await Service.sendTo(this.tabId, 'QueryController@exec', this.database.name, sql);
+            sets = results.sets;
 
-                return Vue.nextTick();
-            })
-            .catch(err => {
-                reject(err);
-            });
+            for(let data of results.infoSets) {
+                this.tab.log.info(data, this.database.name);
+            }
+
+        }
+        catch (e) {
+            this.tab.log.error(e, this.database.name);
+        }
+
+        for(let set of sets) {
+            this.resultsSets.push(new QueryResultSet(this.tabId, ...set));
+        }
+
+        return Vue.nextTick();
     }
 
     clearSets() {
@@ -97,8 +105,12 @@ export default class Query {
         Vue.delete(this.resultsSets, setIndex);
     }
 
-    tabId() {
-        return this.database.tabId();
+    get tab() {
+        return this.database.tab;
+    }
+
+    get tabId() {
+        return this.database.tabId;
     }
 
 }

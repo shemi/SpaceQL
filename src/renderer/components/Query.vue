@@ -98,10 +98,12 @@
 
                 this.query.exec(this.queryString)
                     .then(() => {
+                        this.query.selectedTab = 0;
                         this.loading = false;
                     })
                     .catch(err => {
-                        console.log(err);
+                        console.error(err);
+                        this.loading = false;
                     });
             },
 
@@ -112,7 +114,9 @@
 
         computed: {
             tab() {
-                return this.$store.getters['Tabs/currentTab'];
+                return this.$store.getters['Tabs/getTabById'](
+                    parseInt(this.$route.params.tabId)
+                );
             },
 
             tabId() {

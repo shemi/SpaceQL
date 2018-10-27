@@ -13,6 +13,7 @@ export default class Grammar {
 
     constructor(tablePrefix = '') {
         this.tablePrefix = tablePrefix;
+        this.values = [];
     }
 
     compileSelect(query) {
@@ -23,6 +24,8 @@ export default class Grammar {
         }
 
         let sql = this.compileComponents(query);
+
+        console.log(sql);
 
         query.columns = original;
 
@@ -102,7 +105,9 @@ export default class Grammar {
                 sql += ' '+whereObject.bool+' ';
             }
 
-            return sql + this.wrap(whereObject.column) + ' ' + whereObject.operator + ' ' + whereObject.value;
+            this.values.push(whereObject.value);
+
+            return sql + this.wrap(whereObject.column) + ' ' + whereObject.operator + ' ?';
         }).join(' ');
     }
 

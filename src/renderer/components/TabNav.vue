@@ -338,6 +338,8 @@
         position: relative;
         background-color: $main-tabs-background-color;
         overflow: hidden;
+        flex-shrink: 0;
+        flex-grow: 0;
     }
 
     .el-tabs__header {

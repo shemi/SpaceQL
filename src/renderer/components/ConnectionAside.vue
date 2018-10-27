@@ -1,24 +1,30 @@
 <template>
 
-    <div>
+    <div class="connection-aside-container aside-container">
 
-        <ul class="tables-list" v-if="tables">
 
-            <li v-for="table in tables.all()"
-                @click="selectTable(table)"
-                :key="table.name">
-                {{ table.name }}
-            </li>
+        <div class="aside-list" v-if="tables">
+            <div v-for="item in tables.all()"
+                 :key="item.name" class="aside-list-item">
+                <a @click="selectTable(item)"
+                   :class="{'is-active': table && item.name === table.name}"
+                   class="aside-item">
+                    <span>{{ item.name }}</span>
+                </a>
+            </div>
+        </div>
 
-        </ul>
 
     </div>
 
 </template>
 
 <script>
+    import GeneralComputedMixin from '../mixins/GeneralComputedMixin';
 
     export default {
+
+        mixins: [GeneralComputedMixin],
 
         methods: {
             selectTable(table) {
@@ -29,21 +35,6 @@
         },
 
         computed: {
-            tab() {
-                return this.$store.getters['Tabs/currentTab'];
-            },
-
-            tabId() {
-                return this.tab ? this.tab.id : '';
-            },
-
-            connection() {
-                return this.tab ? this.tab.connection : null;
-            },
-
-            database() {
-                return this.connection ? this.connection.selectedDatabase : null;
-            },
 
             tables() {
                 return this.database ? this.database.tables : null;
@@ -56,7 +47,41 @@
 </script>
 
 <style lang="scss">
+    @import "../scss/variables";
 
+    .aside-item {
+        color: black;
+        text-decoration: none;
+        padding: 10px 5px;
+        display: block;
+        cursor: pointer;
 
+        &:hover {
+            color: $--color-primary-light-2;
+        }
+
+        &.is-active {
+            color: $--color-primary;
+        }
+    }
+
+    .aside-list {
+        .aside-list-item {
+            border-bottom: 1px solid $--color-border-main-main-aside;
+
+            .aside-item {
+                display: flex;
+                align-items: center;
+                line-height: 0.9;
+                font-size: 0.9em;
+                padding: 8px 5px;
+            }
+
+            .svg-icon {
+                margin-right: 6px;
+            }
+
+        }
+    }
 
 </style>

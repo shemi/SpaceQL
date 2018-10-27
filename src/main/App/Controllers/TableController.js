@@ -1,10 +1,16 @@
 import Controller from "./Controller";
-import Connection from '../Connection';
 
 class TableController extends Controller {
 
-    async content(connectionId, databaseName, tableName, query = {}, order = {}, limit = 100) {
-        const {table} = this.getConnectionDatabaseAndTable(connectionId, databaseName, tableName);
+    get actions() {
+        return [
+            'content'
+        ];
+    }
+
+    async content(databaseName, tableName, query = {}, order = {}, limit = 100) {
+        const database = this.connection.databases.find({name: databaseName});
+        const table = database.tables.find({name: tableName});
 
         return this.response(
             await table.getContent(query, order, limit)

@@ -8,7 +8,6 @@ class Router {
     register(routes) {
         for(let route of routes) {
             for(let action of Object.keys(route.actions)) {
-                console.log(route.controller, action);
                 this.registerRoute(route.controller, action, route['actions'][action]);
             }
         }

@@ -1,5 +1,6 @@
 import { ipcRenderer } from 'electron';
 import uuid from 'uuid/v4';
+import SqlError from "../utils/Exceptions/SqlError";
 
 class Service {
 
@@ -26,16 +27,7 @@ class Service {
                     return null;
                 }
 
-                switch (status) {
-                    case 'success':
-                        return resolve(returnData);
-                    case 'failure':
-                        console.error(new Error(returnData));
-
-                        return reject(new Error(returnData));
-                    default:
-                        return reject(new Error(`Unexpected IPC call status "${status}" in ${route}`));
-                }
+                this.handleResponse(status, returnData, resolve, reject);
             });
 
             ipcRenderer.send(route, replyChannel, ...dataArgs);
@@ -44,12 +36,14 @@ class Service {
                 timeout = setTimeout(() => {
                     didTimeOut = true;
                     reject(new Error(`${route} timed out.`));
-                }, this.maxTimeoutMs);
+                }, this.maxTimeoutMs || 2000);
             }
         });
     }
 
     sendTo(tabID, route, ...dataArgs) {
+        console.log(tabID, route);
+
         return new Promise((resolve, reject) => {
             const replyChannel = `${route}#${uuid()}`;
             let timeout;
@@ -62,17 +56,17 @@ class Service {
                     return null;
                 }
 
-                switch (status) {
-                    case 'success':
-                        return resolve(returnData);
-                    case 'failure':
-                        return reject(new Error(returnData));
-                    default:
-                        return reject(new Error(`Unexpected IPC call status "${status}" in ${route}`));
-                }
+                this.handleResponse(status, returnData, resolve, reject);
             });
 
             ipcRenderer.sendTo(tabID, route, replyChannel, ...dataArgs);
+
+            if (this.maxTimeoutMs) {
+                timeout = setTimeout(() => {
+                    didTimeOut = true;
+                    reject(new Error(`${route} timed out.`));
+                }, this.maxTimeoutMs);
+            }
         });
     }
 
@@ -88,6 +82,31 @@ class Service {
                     ipcRenderer.send(replyChannel, 'failure', message);
                 });
         });
+    }
+
+    handleResponse(status, returnData, resolve, reject) {
+        switch (status) {
+            case 'success':
+                return resolve(returnData);
+            case 'failure':
+                let error = null;
+
+                if(typeof returnData === 'string') {
+                    error = new Error(returnData);
+                }
+
+                else if(returnData && returnData.sqlMessage) {
+                    error = new SqlError(returnData);
+                }
+
+                else if(returnData && returnData.message) {
+                    error = new Error(returnData.message);
+                }
+
+                return reject(error);
+            default:
+                return reject(new Error(`Unexpected IPC call status "${status}" in ${route}`));
+        }
     }
 
 }

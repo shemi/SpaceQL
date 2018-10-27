@@ -1,13 +1,8 @@
+import {BUILDER_OPRATORS} from "../../../utils/constants";
+
 export default class QueryBuilder {
 
-    static operators = [
-        '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
-        'like', 'like binary', 'not like', 'ilike',
-        '&', '|', '^', '<<', '>>',
-        'rlike', 'regexp', 'not regexp',
-        '~', '~*', '!~', '!~*', 'similar to',
-        'not similar to', 'not ilike', '~~*', '!~~*',
-    ];
+    static operators = BUILDER_OPRATORS;
 
     constructor(driver) {
         this.driver = driver;

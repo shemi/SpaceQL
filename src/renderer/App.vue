@@ -30,9 +30,14 @@
 <script>
     import MainHeader from './components/MainHeader';
     import TabsNav from './components/TabNav';
+    import Service from "./Service";
 
     export default {
         name: "sonarr-pro",
+
+        created() {
+            Service.send('TabsController@closeAll');
+        },
 
         components: {
             MainHeader,

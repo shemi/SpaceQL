@@ -3,8 +3,16 @@ import RowsChunks from '../RowsChunks';
 
 class QueryController extends Controller {
 
-    exec(connectionId, databaseName, queryString) {
-        const {database} = this.getConnectionAndDatabase(connectionId, databaseName);
+    get actions() {
+        return [
+            'exec',
+            'nextChunk',
+            'deleteChunk'
+        ];
+    }
+
+    exec(databaseName, queryString) {
+        const database = this.connection.databases.find({name: databaseName});
 
         return new Promise((resolve, reject) => {
             database.query(queryString)
@@ -23,22 +31,6 @@ class QueryController extends Controller {
 
     deleteChunk(id) {
         return this.response(RowsChunks.clear(id));
-    }
-
-    slowDown() {
-        let arr = [];
-
-        for(let i = 0; i < 10000000; i++) {
-            arr.push(i);
-
-            for(let j = 0; j < 1000; j++) {
-
-            }
-        }
-
-        JSON.stringify(arr);
-
-        return;
     }
 
 }
