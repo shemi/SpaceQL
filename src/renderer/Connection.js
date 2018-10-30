@@ -3,7 +3,7 @@ import Service from "./Service";
 
 export default class Connection {
 
-    constructor(rawConnection, originalForm = {}) {
+    constructor(rawConnection, originalForm = {}, tab) {
 
         let {
             name,
@@ -11,10 +11,8 @@ export default class Connection {
             version
         } = rawConnection;
 
-        console.log(rawConnection, originalForm);
-
+        this.tab = tab;
         this.form = originalForm;
-
         this.name = name;
         this.databases = new DatabasesCollection(databases || [], this);
         this.selectedDatabase = this.getFirstDatabaseToSelect();
@@ -22,7 +20,6 @@ export default class Connection {
         this.log = [];
         this.version = version.version;
         this.fullVersion = version.fullVersion;
-        this.tab = null;
     }
 
     getFirstDatabaseToSelect() {
@@ -66,9 +63,7 @@ export default class Connection {
 
     static async connect(connectionForm, tab) {
         const rawConnection = await Service.sendTo(tab.id, 'ConnectionController@connect', connectionForm),
-            inst = new Connection(rawConnection, connectionForm);
-
-        inst.setTab(tab);
+            inst = new Connection(rawConnection, connectionForm, tab);
 
         return inst;
     }

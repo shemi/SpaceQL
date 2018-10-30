@@ -1,34 +1,39 @@
 <template>
 
     <div class="snr-data-table" v-loading="loading">
-        <data-table-header :columns="columns"
-                           :is-sortable="sortable"
-                           :order="order">
-        </data-table-header>
+        <div class="snr-data-table-wrap" :style="wrapStyle">
+            <data-table-header :columns="columns"
+                               :is-sortable="sortable"
+                               @update-style="updateWidth"
+                               :order="order">
+            </data-table-header>
 
-        <div class="data-table-content" ref="contentEl">
+            <div class="data-table-content"
+                 :style="contentStyle"
+                 ref="contentEl">
 
-            <virtual-list v-show="scrollReady && content.length > 0 && ! loading"
-                          :size="rowSize"
-                          :remain="remainRows"
-                          :bench="rowsBench"
-                          v-if="scrollReady"
-                          :tobottom="loadMore"
-                          class="data-table-content-holder">
+                <virtual-list v-show="scrollReady && content.length > 0 && ! loading"
+                              :size="rowSize"
+                              :remain="remainRows"
+                              :bench="rowsBench"
+                              v-if="scrollReady"
+                              :tobottom="loadMore"
+                              class="data-table-content-holder">
 
-                <data-table-row
-                        v-for="(row, index) in content"
-                        :key="index"
-                        :row="row"
-                        :cells-style="cellsStyle"
-                        :columns="columns">
-                </data-table-row>
+                    <data-table-row
+                            v-for="(row, index) in content"
+                            :key="index"
+                            :row="row"
+                            :cells-style="cellsStyle"
+                            :columns="columns">
+                    </data-table-row>
 
-            </virtual-list>
+                </virtual-list>
 
+            </div>
+
+            <resize-observer @notify="handleResize" />
         </div>
-
-        <resize-observer @notify="handleResize" />
     </div>
 
 </template>
@@ -38,6 +43,31 @@
     import DataTableRow from './DataTableRow';
     import VirtualList from 'vue-virtual-scroll-list';
     import debounce from 'lodash/debounce';
+
+    function getScrollbarWidth() {
+        var outer = document.createElement("div");
+        outer.style.visibility = "hidden";
+        outer.style.width = "100px";
+        outer.style.msOverflowStyle = "scrollbar"; // needed for WinJS apps
+
+        document.body.appendChild(outer);
+
+        var widthNoScroll = outer.offsetWidth;
+        // force scrollbars
+        outer.style.overflow = "scroll";
+
+        // add innerdiv
+        var inner = document.createElement("div");
+        inner.style.width = "100%";
+        outer.appendChild(inner);
+
+        var widthWithScroll = inner.offsetWidth;
+
+        // remove divs
+        outer.parentNode.removeChild(outer);
+
+        return widthNoScroll - widthWithScroll;
+    }
 
     export default {
 
@@ -77,6 +107,11 @@
                 scrollReady: false,
                 rowSize: 23,
                 remainRows: 0,
+                contentStyle: {width: '100%'},
+                wrapStyle: {
+                    width: `calc(100% + ${getScrollbarWidth()}px)`,
+                    height: `calc(100% + ${getScrollbarWidth()}px)`
+                },
                 rowsBench: 0
             }
         },
@@ -94,6 +129,8 @@
 
         mounted() {
             this.updateList();
+
+            console.log(this.wrapStyle);
         },
 
         methods: {
@@ -125,6 +162,10 @@
 
             loadMore() {
                 this.$emit('load-next');
+            },
+
+            updateWidth(width) {
+                this.contentStyle.width = (getScrollbarWidth() + width) + 'px';
             }
         },
 
@@ -148,10 +189,24 @@
         justify-content: flex-start;
         font-size: 0.85em;
         line-height: 1;
-        overflow-x: auto;
-        overflow-y: auto;
-        height: 100%;
         position: relative;
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
+
+        .snr-data-table-wrap {
+            display: flex;
+            position: relative;
+            overflow-x: scroll;
+            overflow-y: auto;
+            height: 100%;
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            flex-grow: 1;
+            flex-shrink: 0;
+        }
 
         .data-table-header {
             flex-grow: 0;
@@ -189,6 +244,10 @@
         .row-selector {
             width: 28px;
             height: 23px;
+        }
+
+        .data-table-content-holder {
+            height: 100%;
         }
 
         .data-table-cell {

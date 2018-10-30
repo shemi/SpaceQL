@@ -7,7 +7,7 @@ export default class Column {
             default_value, is_nullable,
             data_type, character_maximum_length,
             character_set, collation,
-            column_key, extra, privileges,
+            column_key, privileges,
             comment
         } = data;
 
@@ -20,7 +20,6 @@ export default class Column {
         this.character_set = character_set;
         this.collation = collation;
         this.column_key = column_key;
-        this.extra = extra;
         this.privileges = privileges;
         this.comment = comment;
         this.table = table;

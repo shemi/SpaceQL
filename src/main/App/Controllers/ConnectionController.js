@@ -12,8 +12,6 @@ class ConnectionController extends Controller {
     }
 
     async test(connectionForm) {
-        console.log('testing');
-
         const connection = new Connection(
             this.transformConnectionForm(connectionForm)
         );

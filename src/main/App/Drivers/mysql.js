@@ -4,6 +4,7 @@ import QueryBuilder from "./QueryBuilder";
 import MySqlGrammar from "./Grammars/MySqlGrammar";
 import { Crud } from 'mysql-crud-parser';
 import ResultSet from "./ResultSet";
+import moment from "moment";
 
 class MysqlDriver extends Driver {
 
@@ -31,17 +32,19 @@ class MysqlDriver extends Driver {
     }
 
     async getDatabases() {
-        let [rows, columns] = await this.query(`
-            SELECT SCHEMA_NAME AS \`database\`, 
-            DEFAULT_CHARACTER_SET_NAME AS \`default_character_set\`,
-            DEFAULT_COLLATION_NAME AS \`default_collation\`
-            FROM INFORMATION_SCHEMA.SCHEMATA`);
+        let {rows: databases} = await this.query(`
+            SELECT 
+                SCHEMA_NAME AS \`database\`, 
+                DEFAULT_CHARACTER_SET_NAME AS \`default_character_set\`,
+                DEFAULT_COLLATION_NAME AS \`default_collation\`
+            FROM INFORMATION_SCHEMA.SCHEMATA
+            `, [], true);
 
-        return rows;
+        return databases;
     }
 
     async getTables(database) {
-        let [tables, columns] = await this.query(`
+        let {rows: tables} = await this.query(`
             select 
                 TABLE_NAME as \`name\`,
                 TABLE_TYPE as \`type\`,
@@ -53,9 +56,32 @@ class MysqlDriver extends Driver {
                 TABLE_SCHEMA
             from INFORMATION_SCHEMA.TABLES
             where TABLE_SCHEMA = ?
-        `, [database]);
+        `, [database], true);
 
         return tables;
+    }
+
+    async getColumns(database, table) {
+        let {rows: columns} = await this.query(`
+            SELECT 
+                COLUMN_NAME as \`name\`,
+                ORDINAL_POSITION as \`position\`,
+                COLUMN_DEFAULT as \`default_value\`,
+                IS_NULLABLE as \`is_nullable\`,
+                DATA_TYPE as \`data_type\`,
+                CHARACTER_MAXIMUM_LENGTH as \`character_maximum_length\`,
+                CHARACTER_SET_NAME as \`character_set\`,
+                COLLATION_NAME as \`collation\`,
+                COLUMN_KEY as \`column_key\`,
+                PRIVILEGES as \`privileges\`,
+                COLUMN_COMMENT as \`comment\`
+            FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = ? 
+                AND TABLE_NAME = ?
+            ORDER BY position
+	    `, [database, table], true);
+
+        return columns;
     }
 
     async getConnection() {
@@ -66,12 +92,12 @@ class MysqlDriver extends Driver {
         return this.connection;
     }
 
-    async use(database, release = false) {
+    async use(database) {
         if(this.using === database) {
             return this;
         }
 
-        await this.query('USE '+ database, [], release);
+        await this.query('USE '+ database, [], true);
         this.using = database;
 
         return this;
@@ -81,45 +107,43 @@ class MysqlDriver extends Driver {
         return new QueryBuilder(this);
     }
 
-    async query(sql, values = [], release = true) {
+    async query(sql, values = [], single = false) {
+        let start = moment();
+
         if(sql instanceof QueryBuilder) {
             let grammar = new MySqlGrammar;
             sql = grammar.compileSelect(sql);
             values = grammar.values;
-        }
-
-        let crud = new Crud(sql);
-        // crud.statements
-
-        return new Promise((resolve, reject) => {
-            this.getConnection()
-                .then(connection => connection.query(sql, values))
-                .then(results => {
-                    resolve(results);
-                })
-                .catch(e => reject(e));
-        });
-    }
-
-    async tempQuery(sql, values = []) {
-        if(sql instanceof QueryBuilder) {
-            let grammar = new MySqlGrammar;
-            sql = grammar.compileSelect(sql);
-            values = grammar.values;
+            single = true;
         }
 
         let crud = new Crud(sql),
             connection = await this.getConnection(),
             sets = [],
-            statement;
+            statement,
+            [rowsSets, columnsSets] = await connection.query(sql, values),
+            index = 0;
 
-        // select * from users;
-        // delete from users where id = 301
+        if(rowsSets && ! Array.isArray(rowsSets[0])) {
+            rowsSets = [rowsSets];
+        }
+
+        else if(! rowsSets) {
+            rowsSets = [];
+        }
+
+        if(columnsSets && ! Array.isArray(columnsSets[0])) {
+            columnsSets = [columnsSets];
+        }
+
+        else if(! columnsSets) {
+            columnsSets = [];
+        }
 
         for(statement of crud.statements) {
-            let queryString = statement.toString();
-            let resultSet = new ResultSet(statement);
-            let [rows, columns] = await connection.query(queryString, values);
+            let rows = rowsSets[index];
+            let columns = columnsSets[index];
+            let resultSet = new ResultSet(statement, start);
 
             if(Array.isArray(rows) && columns) {
                 resultSet.setRows(rows, columns);
@@ -128,13 +152,14 @@ class MysqlDriver extends Driver {
             }
 
             sets.push(resultSet);
+            index++;
         }
 
-        return sets;
+        return single && sets.length > 0 ? sets[0] : sets;
     }
 
     async getVersion(full = false, refresh = false) {
-        let [rows, columns] = await this.query('show variables like "%version%"'),
+        let {rows} = await this.query('SHOW variables LIKE "%version%"', [], true),
             fullVersion = null;
 
         for (let row of rows) {

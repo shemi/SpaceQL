@@ -1,4 +1,5 @@
 import uuid from 'uuid/v4';
+import electron from 'electron';
 
 class Service {
 
@@ -14,6 +15,9 @@ class Service {
     }
 
     send(route, ...dataArgs) {
+        let tabId = electron.remote.getCurrentWindow().webContents.id;
+        route = `${tabId}__${route}`;
+
         return new Promise((resolve, reject) => {
             const replyChannel = `${route}#${uuid()}`;
             let timeout;
@@ -36,7 +40,7 @@ class Service {
                 }
             });
 
-            this.ipc.send(route, replyChannel, ...dataArgs);
+            this.ipc.sendTo(1, route, replyChannel, ...dataArgs);
 
             if (this.maxTimeoutMs) {
                 timeout = setTimeout(() => {
@@ -48,9 +52,7 @@ class Service {
     }
 
     on(route, listener) {
-        console.log(route);
         this.ipc.on(route, (event, replyChannel, ...dataArgs) => {
-            console.log('call: ' + route);
             Promise.resolve().then(() => listener(...dataArgs))
                 .then((results) => {
                     this.ipc.sendTo(1, replyChannel, 'success', results);

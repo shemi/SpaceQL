@@ -36,6 +36,10 @@ export default class Database {
         this.tablesLoaded = true;
     }
 
+    async getColumns(table) {
+        return this.connection.getColumns(this.name, table);
+    }
+
     async queryTable(tableName, query, order, limit) {
         const db = await this.connection.use(this.name);
 
@@ -50,65 +54,11 @@ export default class Database {
         return await builder.get();
     }
 
-    query(query) {
-        const chunkSize = RowsChunks.getRowsPerChunk();
-        const startTime = moment();
+    async query(query) {
+        const db = await this.connection.use(this.name);
+        const results = await db.query(query);
 
-        return new Promise((resolve, reject) => {
-            this.connection.use(this.name)
-                .then(db => db.tempQuery(query))
-                .then(results => {
-                    resolve(results.map((set) => set.toJSON()));
-                    return;
-
-                    let infoSets = [];
-                    let sets = [];
-
-                    if(! columnsSets) {
-                        let infoData = Array.isArray(rowsSets) ? rowsSets : [rowsSets],
-                            data;
-
-                        for(data of infoData) {
-                            infoSets.push(
-                                ResultSetHeader
-                                    .createAndClose(startTime, data)
-                                    .toJson()
-                            );
-                        }
-
-                        columnsSets = [];
-                        rowsSets = [];
-                    } else {
-                        rowsSets = (! Array.isArray(rowsSets[0])) ? [rowsSets] : rowsSets;
-                        columnsSets = (! Array.isArray(columnsSets[0])) ? [columnsSets] : columnsSets;
-                    }
-
-                    for(let setIndex in rowsSets) {
-                        let rows = rowsSets[setIndex];
-                        let columns = columnsSets[setIndex];
-                        let total = rows ? rows.length : 0;
-                        let chunksId = null;
-
-                        if(total > chunkSize) {
-                            let chunk = RowsChunks.create(rows);
-
-                            rows = chunk.rows;
-                            chunksId = chunk.id;
-                        }
-
-                        infoSets.push(
-                            ResultSetHeader
-                                .createAndClose(startTime, {rowsCount: total})
-                                .toJson()
-                        );
-
-                        sets.push([rows, columns, chunksId, total, setIndex]);
-                    }
-
-                    resolve({sets, infoSets});
-                })
-                .catch(err => reject(err));
-        });
+        return results.map((set) => set.toJSON());
     }
 
     isSystemDatabase() {

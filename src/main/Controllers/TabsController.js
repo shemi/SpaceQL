@@ -19,6 +19,8 @@ class TabsController extends Controller {
     }
 
     close(id) {
+        console.log('close tab', id);
+
         Tabs.instance()
             .close(id);
 

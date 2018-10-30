@@ -1,19 +1,16 @@
 import Collection from "../utils/Collection";
 import Service from "./Service";
-import Connection from "./Connection";
-import {CONNECT} from "../utils/main-events";
-
 
 export default class Table {
 
     constructor(data, database) {
-
         let { name, type,
             engine, format,
-            rows, created_at,
-            collation, comment,
-            columns
+            created_at, collation,
+            comment, columns
         } = data;
+
+        this.database = database;
 
         this.name = name;
         this.type = type;
@@ -25,9 +22,46 @@ export default class Table {
         this.columns = new Collection(columns, this);
         this.content = new Collection([], this);
 
-        this.database = database;
-
         this.lastQuery = null;
+
+        Service.on(this.tabId, `UpdateTable@${this.name}`, this.update.bind(this));
+    }
+
+    update(data) {
+        let { name, type,
+            engine, format, collation,
+            comment, columns
+        } = data;
+
+        if(name) {
+            this.name = name;
+        }
+
+        if(type) {
+            this.type = type;
+        }
+
+        if(engine) {
+            this.engine = engine;
+        }
+
+        if(format) {
+            this.format = format;
+        }
+
+        if(collation) {
+            this.collation = collation;
+        }
+
+        if(comment) {
+            this.comment = comment;
+        }
+
+        if(columns) {
+            this.columns.deleteAll();
+            this.columns.collect(columns);
+        }
+
     }
 
     async getContent(query = {}, order = {}, limit = 100, refresh = false) {
@@ -63,6 +97,13 @@ export default class Table {
         }
 
         return this.getContent(...JSON.parse(this.lastQuery), true);
+    }
+
+    get toAutocomplete() {
+        return {
+            text: this.name,
+            columns: this.columns.pluck('name')
+        }
     }
 
     get tabId() {

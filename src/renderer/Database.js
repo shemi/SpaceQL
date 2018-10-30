@@ -9,15 +9,14 @@ export default class Database {
             default_character_set,
             default_collation} = data;
 
+        this.connection = connection;
+
         this.name = name;
         this.tables = new TablesCollection(tables || [], this);
         this.tablesLoaded = this.tables.isNotEmpty();
         this.selectedTable = null;
         this.default_character_set = default_character_set;
         this.default_collation = default_collation;
-
-        this.connection = connection;
-
         this.query = new Query(this);
 
         this.loadingTables = false;
@@ -50,6 +49,16 @@ export default class Database {
         this.loadingTables = false;
 
         return this;
+    }
+
+    get toAutocomplete() {
+        let tables = [];
+
+        for(let table of this.tables.all()) {
+            tables.push(table.toAutocomplete);
+        }
+
+        return tables;
     }
 
     get tab() {

@@ -56,7 +56,10 @@ let mainConfig = {
         }),
     ],
     resolve: {
-        extensions: ['.js', '.json', '.node']
+        extensions: ['.js', '.json', '.node'],
+        alias: {
+            'CodeMirror': 'codemirror',
+        }
     },
     optimization: {
         minimize: false,

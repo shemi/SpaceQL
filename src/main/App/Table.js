@@ -1,6 +1,6 @@
 import ColumnsCollection from "./ColumnsCollection";
 import Collection from "../../utils/Collection";
-
+import app from './App';
 
 export default class Table {
 
@@ -9,8 +9,7 @@ export default class Table {
         let { name, type,
             engine, format,
             rows, created_at,
-            collation, comment,
-            columns
+            collation, comment
         } = data;
 
         this.name = name;
@@ -21,20 +20,38 @@ export default class Table {
         this.created_at = created_at;
         this.collation = collation;
         this.comment = comment;
-        this.columns = new ColumnsCollection(columns, this);
+        this.columns = new ColumnsCollection([], this);
+        this.columnsLoaded = false;
         this.content = new Collection;
 
         this.database = database;
+
+        this.getColumns()
+            .then(c => {this.updateFront()});
+    }
+
+    async getColumns(refresh = false) {
+        if(! refresh && this.columnsLoaded) {
+            return this.columns;
+        }
+
+        this.columns.deleteAll();
+        this.columns.collect(await this.database.getColumns(this.name));
+
+        return this.columns;
+    }
+
+    updateFront() {
+        app.instance().service
+            .send(`UpdateTable@${this.name}`, this.toRenderer())
     }
 
     async getContent(query = null, order = null, limit = 200) {
-        this.columns.deleteAll();
         this.content.deleteAll();
 
-        let [data, columns] = await this.database.queryTable(this.name, query, order, limit);
+        let {rows: data} = await this.database.queryTable(this.name, query, order, limit);
 
         this.content.collect(data);
-        this.columns.collect(columns);
 
         return {
             rows: this.content.toRenderer(),
@@ -52,8 +69,7 @@ export default class Table {
             created_at: this.created_at,
             collation: this.collation,
             comment: this.comment,
-            columns: this.columns.toRenderer(),
-            content: this.content.toRenderer()
+            columns: this.columns.toRenderer()
         }
     }
 

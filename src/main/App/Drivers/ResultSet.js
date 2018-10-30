@@ -3,8 +3,8 @@ import RowsChunks from './RowsChunks';
 
 class ResultSet {
 
-    constructor(statement) {
-        this.head = new ResultSetHead();
+    constructor(statement, start = null) {
+        this.head = new ResultSetHead(start);
         this.rows = [];
         this.columns = null;
         this.statement = statement;

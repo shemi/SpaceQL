@@ -44,7 +44,8 @@ class Tabs {
             throw new Error("Cant close the last Tab");
         }
 
-        tab.close();
+        tab.destroy();
+        delete this.tabs[id];
     }
 
     closeAll() {

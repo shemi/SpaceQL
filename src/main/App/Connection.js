@@ -74,6 +74,10 @@ export default class Connection {
         return await this.driver.getTables(database);
     }
 
+    async getColumns(database, table) {
+        return await this.driver.getColumns(database, table);
+    }
+
     async setDatabases(databases) {
         let rawDatabase,
             database,

@@ -25,8 +25,6 @@ export default class Grammar {
 
         let sql = this.compileComponents(query);
 
-        console.log(sql);
-
         query.columns = original;
 
         return sql;

@@ -18,7 +18,6 @@ class ResultSetHead {
     }
 
     close(data, statement) {
-        console.log('close data:', data);
         this.time.end = moment();
 
         if(data && data.insertId) {

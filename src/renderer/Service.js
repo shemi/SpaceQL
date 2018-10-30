@@ -70,7 +70,9 @@ class Service {
         });
     }
 
-    on(route, listener) {
+    on(tabId, route, listener) {
+        route = `${tabId}__${route}`;
+
         ipcRenderer.on(route, (event, replyChannel, ...dataArgs) => {
             Promise.resolve().then(() => listener(...dataArgs))
                 .then((results) => {

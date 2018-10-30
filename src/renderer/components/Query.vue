@@ -1,32 +1,43 @@
 <template>
 
     <div class="snr-query-container">
-        <div ref="topWindow" class="query-editor">
-            <monaco v-model="queryString"
-                    language="mysql"
-                    @execute="exec"
-                    ref="editor"></monaco>
+
+        <div class="snt-query-header">
+            <el-button-group class="snt-query-header-actions">
+                <el-button icon="far fa-play-circle" size="small" @click="exec"></el-button>
+                <el-button icon="fas fa-file-upload" size="small"></el-button>
+                <el-button icon="fas fa-file-download" size="small"></el-button>
+            </el-button-group>
         </div>
 
-        <div ref="bottomWindow" class="query-results-table" v-loading="loading">
-            <el-tabs v-model="query.selectedTab" type="card" v-if="! loading">
+        <div class="snr-query-wrap">
+            <div ref="topWindow" class="query-editor">
+                <code-mirror v-model="queryString"
+                             :options="editorOptions">
+                </code-mirror>
+            </div>
 
-                <el-tab-pane v-for="set in query.resultsSets"
-                             :label="'Results #' + set.index"
-                             lazy
-                             :name="'' + set.index">
+            <div ref="bottomWindow" class="query-results-table" v-loading="loading">
+                <el-tabs v-model="query.selectedTab" type="card" v-if="! loading">
 
-                    <data-table :columns="set.columns"
-                                :chunks-id="set.chunksId"
-                                :total="set.total"
-                                ref="dataTables"
-                                @load-next="handelLoadMore(set)"
-                                :content="set.rows">
-                    </data-table>
+                    <el-tab-pane v-for="set in query.resultsSets"
+                                 :label="'Results #' + set.index"
+                                 lazy
+                                 :key="'' + set.index"
+                                 :name="'' + set.index">
 
-                </el-tab-pane>
+                        <data-table :columns="set.columns"
+                                    :chunks-id="set.chunksId"
+                                    :total="set.total"
+                                    ref="dataTables"
+                                    @load-next="handelLoadMore(set)"
+                                    :content="set.rows">
+                        </data-table>
 
-            </el-tabs>
+                    </el-tab-pane>
+
+                </el-tabs>
+            </div>
         </div>
 
         <main-footer></main-footer>
@@ -36,9 +47,9 @@
 
 <script>
     import Split from 'split.js';
-    import Monaco from './Monaco/Monaco';
     import DataTable from './DataTable/DataTable';
     import MainFooter from "./MainFooter";
+    import CodeMirror from "./CodeMirror/CodeMirror";
 
     export default {
 
@@ -46,7 +57,7 @@
             return {
                 activeTab: '1',
                 loading: false,
-                queryString: ''
+                queryString: '',
             }
         },
 
@@ -89,7 +100,7 @@
                     return;
                 }
 
-                this.$refs.editor.getMonaco().layout()
+                this.$refs.editor.refresh();
             },
 
             exec() {
@@ -137,12 +148,34 @@
             query() {
                 return this.database ? this.database.query : null;
             },
+
+            editorOptions() {
+                return {
+                    connect: 'align',
+                    mode: 'text/x-mysql',
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    collapseIdentical: false,
+                    highlightDifferences: true,
+                    extraKeys: {
+                        'Ctrl-Space': 'autocomplete'
+                    },
+                    hintOptions: {
+                        completeSingle: false,
+                        completeOnSingleClick: true,
+                        defaultTable: this.database && this.database.selectedTable ? this.database.selectedTable.name : '',
+                        tables: this.database ? this.database.toAutocomplete : []
+                    },
+                    indentUnit: 4,
+                    lineWrapping: true
+                }
+            }
         },
 
         components: {
             MainFooter,
-            Monaco,
-            DataTable
+            DataTable,
+            CodeMirror
         }
 
     }
@@ -150,6 +183,7 @@
 </script>
 
 <style lang="scss">
+    @import "../scss/variables";
 
     .snr-query-container {
         display: flex;
@@ -159,10 +193,19 @@
         height: 100%;
         box-sizing: border-box;
 
-        > div {
-            box-sizing: border-box;
+        .snr-query-wrap {
+            display: flex;
+            flex-direction: column;
             flex-grow: 1;
             flex-shrink: 1;
+            height: calc(100% - 30px);
+            box-sizing: border-box;
+
+            > div:not(.gutter-vertical) {
+                box-sizing: border-box;
+                flex-grow: 1;
+                flex-shrink: 1;
+            }
         }
 
         .gutter {
@@ -207,6 +250,14 @@
                 border-radius: 0;
             }
 
+        }
+
+        .snt-query-header {
+            background-color: $--color-background-main-header;
+            padding: 5px;
+            border-bottom: 1px solid $--color-border-main-header;
+            flex-grow: 0;
+            flex-shrink: 0;
         }
 
     }

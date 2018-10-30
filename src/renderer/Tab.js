@@ -129,7 +129,7 @@ export default class Tab {
     }
 
     close() {
-        Service.send('Tabs@close', this.id)
+        Service.send('TabsController@close', this.id)
             .then(res => {})
             .catch(err => {
                 console.error(err);

@@ -110,6 +110,8 @@
         padding: 0 20px 0 0;
         background-color: $--color-background-main-aside;
         border-top: 1px solid $--color-border-main-header;
+        flex-grow: 0;
+        flex-shrink: 0;
 
         .sp-main-footer-controls {
             display: flex;

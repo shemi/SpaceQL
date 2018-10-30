@@ -2,7 +2,7 @@
 
     <div class="data-table-header">
 
-        <div class="data-table-row data-table-header-row">
+        <div class="data-table-row data-table-header-row" ref="headerRow">
             <div class="row-selector">
 
             </div>
@@ -39,10 +39,27 @@
         data() {
             return {
                 currentResizeableCell: null,
+                observer: null,
                 cellsStyle: {
 
                 }
             }
+        },
+
+        mounted() {
+            this.observer = new MutationObserver((mutationsList, observer) => {
+                for(let mutation of mutationsList) {
+                    if(mutation.attributeName === 'style') {
+                        this.$emit('update-style', this.$refs.headerRow.getBoundingClientRect().width);
+                    }
+                }
+            });
+
+            this.observer.observe(this.$refs.headerRow, {
+                attributes: true,
+                childList: false,
+                subtree: true
+            });
         },
 
         watch: {
@@ -64,6 +81,14 @@
                 this.rootTable.updateCellWidth(columnIndex, width);
             }
 
+        },
+
+        computed: {
+            rowStyle() {
+                return {
+
+                }
+            }
         },
 
         components: {
