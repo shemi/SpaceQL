@@ -28,8 +28,6 @@
 
         methods: {
             selectTable(table) {
-                console.log('selecting', table);
-
                 this.$set(this.database, 'selectedTable', table);
             }
         },

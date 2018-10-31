@@ -9,11 +9,7 @@ import fs from 'fs';
  */
 function loadMonaco () {
     return new Promise((resolve, reject) => {
-        console.log(path);
-
         const monacoDir = path.join(__dirname, '../../../../', 'node_modules/monaco-editor');
-
-        console.log(__dirname, path.join(monacoDir, '/min/vs/loader.js'));
 
         const loader = require('monaco-editor/min/vs/loader.js');
         const baseUrl = `${monacoDir}/min`;

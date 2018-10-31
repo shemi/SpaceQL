@@ -290,7 +290,6 @@
 
                 this.tab.connect()
                     .then(connection => {
-                        console.log('done connecting');
                         this.busy = false;
                         this.$router.replace(`/${this.tab.id}/connection/query`);
                     })

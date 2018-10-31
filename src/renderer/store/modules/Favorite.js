@@ -85,8 +85,6 @@ const actions = {
     },
 
     removeFavorite({ commit }, id) {
-        console.log(id);
-
         commit('DELETE', id);
 
         return Service.send('FavoritesController@destroy', id);

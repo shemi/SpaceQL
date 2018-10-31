@@ -2,69 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="232e8600-e91d-46c7-a1f2-94d62cc66389" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/shemi.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-brands-400.eot" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-brands-400.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-brands-400.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-brands-400.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-brands-400.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-regular-400.eot" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-regular-400.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-regular-400.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-regular-400.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-regular-400.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-solid-900.eot" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-solid-900.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-solid-900.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-solid-900.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/fonts/fa-solid-900.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/assets/icons/play.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/components/CodeMirror/CodeMirror.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_animated.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_bordered-pulled.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_core.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_fixed-width.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_icons.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_larger.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_list.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_mixins.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_rotated-flipped.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_screen-reader.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_shims.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_stacked.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/_variables.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/brands.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/fontawesome.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/regular.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/solid.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/scss/fontawesome/v4-shims.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.electron-vue/webpack.main.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/.electron-vue/webpack.main.config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/components/DataTable/Scrollbar/bar.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/components/DataTable/Scrollbar/main.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/components/DataTable/Scrollbar/util.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.electron-vue/webpack.renderer.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/.electron-vue/webpack.renderer.config.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/App/Column.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/App/Column.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/App/Connection.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/App/Connection.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/App/Controllers/ConnectionController.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/App/Controllers/ConnectionController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/App/Database.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/App/Database.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/App/Drivers/Grammars/Grammar.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/App/Drivers/Grammars/Grammar.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/App/Drivers/ResultSet.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/App/Drivers/ResultSet.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/App/Drivers/ResultSetHead.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/App/Drivers/ResultSetHead.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/App/Drivers/mysql.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/App/Drivers/mysql.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/App/Service.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/App/Service.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/App/Table.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/App/Table.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/Controllers/TabsController.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/Controllers/TabsController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/Tabs.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/Tabs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/Connection.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/Connection.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/Database.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/Database.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/Service.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/Service.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/Tab.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/Tab.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/Table.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/Table.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/components/ConnectionAside.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/ConnectionAside.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/components/ConnectionForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/ConnectionForm.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/components/DataTable/DataTable.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/DataTable/DataTable.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/components/DataTable/DataTableHeader.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/DataTable/DataTableHeader.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/components/MainFooter.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/MainFooter.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/components/Query.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/Query.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/components/Query.vue___jb_tmp___" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/scss/app.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/scss/app.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/components/Monaco/Loader.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/Monaco/Loader.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/components/TableContent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/TableContent.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/store/modules/Favorite.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/store/modules/Favorite.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -127,39 +76,39 @@
     <session id="1973149666">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="3" />
+          <entry key="project.closed" value="5" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.open.time.2" value="1" />
-          <entry key="project.open.time.3" value="1" />
+          <entry key="project.open.time.3" value="2" />
           <entry key="project.open.time.4" value="1" />
           <entry key="project.open.time.5" value="4" />
           <entry key="project.open.time.7" value="1" />
           <entry key="project.open.time.8" value="1" />
-          <entry key="project.opened" value="10" />
+          <entry key="project.opened" value="11" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="css" value="6" />
-          <entry key="js" value="209" />
+          <entry key="js" value="226" />
           <entry key="json" value="3" />
           <entry key="md" value="1" />
           <entry key="scss" value="25" />
           <entry key="svg" value="1" />
           <entry key="ts" value="13" />
-          <entry key="vue" value="38" />
+          <entry key="vue" value="39" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="CSS" value="6" />
           <entry key="JSON" value="3" />
-          <entry key="JavaScript" value="209" />
+          <entry key="JavaScript" value="226" />
           <entry key="Markdown" value="1" />
           <entry key="SCSS" value="25" />
           <entry key="SVG" value="1" />
           <entry key="TypeScript" value="13" />
-          <entry key="Vue.js" value="38" />
+          <entry key="Vue.js" value="39" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
@@ -167,7 +116,7 @@
           <entry key="js" value="11167" />
           <entry key="md" value="12" />
           <entry key="scss" value="20" />
-          <entry key="vue" value="3854" />
+          <entry key="vue" value="4900" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
@@ -175,7 +124,7 @@
           <entry key="JavaScript" value="11167" />
           <entry key="Markdown" value="12" />
           <entry key="SCSS" value="20" />
-          <entry key="Vue.js" value="3854" />
+          <entry key="Vue.js" value="4900" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.js.language.service.starts">
@@ -186,13 +135,47 @@
     </session>
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/renderer/components/DataTable/DataTable.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="40">
+              <caret line="2" column="30" selection-start-line="2" selection-start-column="30" selection-end-line="2" selection-end-column="30" />
+              <folding>
+                <element signature="e#1365#1413#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/renderer/components/DataTable/Scrollbar/main.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="427">
+              <caret line="113" column="25" lean-forward="true" selection-start-line="113" selection-start-column="25" selection-end-line="113" selection-end-column="25" />
+              <folding>
+                <element signature="e#617#707#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/renderer/components/DataTable/Scrollbar/bar.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="700">
+              <caret line="41" column="26" lean-forward="true" selection-start-line="41" selection-start-column="26" selection-end-line="41" selection-end-column="26" />
+              <folding>
+                <element signature="e#45#96#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>insertId</find>
-      <find>affectedRows</find>
-      <find>sonarr-pro</find>
       <find>export</find>
       <find>mysq</find>
       <find>matchBrackets</find>
@@ -220,6 +203,9 @@
       <find>res</find>
       <find>map</find>
       <find>CodeMirror</find>
+      <find>console.lo</find>
+      <find>viewStyle</find>
+      <find>$attrs</find>
     </findStrings>
     <replaceStrings>
       <replace>;</replace>
@@ -231,13 +217,13 @@
       <dir>D:\VM\Apps\sonarr-pro\src\renderer\scss</dir>
       <dir>D:\VM\Apps\sonarr-pro\src\main\App\Drivers</dir>
       <dir>D:\VM\Apps\sonarr-pro\.electron-vue</dir>
-      <dir>D:\VM\Apps\sonarr-pro\src\renderer</dir>
       <dir>D:\VM\Apps\sonarr-pro\build\sonarr-pro-win32-x64</dir>
       <dir>D:\VM\Apps\sonarr-pro</dir>
       <dir>D:\VM\Apps\sonarr-pro\src\main\App</dir>
       <dir>D:\VM\Apps\sonarr-pro\node_modules</dir>
       <dir>D:\VM\Apps\sonarr-pro\node_modules\codemirror</dir>
       <dir>D:\VM\Apps\sonarr-pro\src</dir>
+      <dir>D:\VM\Apps\sonarr-pro\src\renderer</dir>
     </dirStrings>
   </component>
   <component name="Git.Settings">
@@ -246,9 +232,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/App/Controllers/QueryController.js" />
-        <option value="$PROJECT_DIR$/src/renderer/components/TabNav.vue" />
-        <option value="$PROJECT_DIR$/src/renderer/mixins/GeneralComputedMixin.js" />
         <option value="$PROJECT_DIR$/src/main/App/Controllers/DatabaseController.js" />
         <option value="$PROJECT_DIR$/src/main/App/Drivers/Grammars/Grammar.js" />
         <option value="$PROJECT_DIR$/src/renderer/components/ConnectionAside.vue" />
@@ -280,7 +263,6 @@
         <option value="$PROJECT_DIR$/src/renderer/Tab.js" />
         <option value="$PROJECT_DIR$/src/renderer/Service.js" />
         <option value="$PROJECT_DIR$/src/renderer/components/DataTable/DataTableHeader.vue" />
-        <option value="$PROJECT_DIR$/src/renderer/components/DataTable/DataTable.vue" />
         <option value="$PROJECT_DIR$/src/renderer/scss/app.scss" />
         <option value="$PROJECT_DIR$/src/renderer/scss/fontawesome/_variables.scss" />
         <option value="$PROJECT_DIR$/src/renderer/scss/fontawesome/fontawesome.scss" />
@@ -297,6 +279,10 @@
         <option value="$PROJECT_DIR$/src/renderer/Database.js" />
         <option value="$PROJECT_DIR$/src/renderer/components/Query.vue" />
         <option value="$PROJECT_DIR$/src/renderer/Table.js" />
+        <option value="$PROJECT_DIR$/.electron-vue/webpack.renderer.config.js" />
+        <option value="$PROJECT_DIR$/src/renderer/components/DataTable/Scrollbar/bar.vue" />
+        <option value="$PROJECT_DIR$/src/renderer/components/DataTable/DataTable.vue" />
+        <option value="$PROJECT_DIR$/src/renderer/components/DataTable/Scrollbar/main.vue" />
       </list>
     </option>
   </component>
@@ -354,6 +340,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -364,6 +351,11 @@
             <path>
               <item name="sonarr-pro" type="b2602c69:ProjectViewProjectNode" />
               <item name="sonarr-pro" type="462c0819:PsiDirectoryNode" />
+              <item name=".electron-vue" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="sonarr-pro" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sonarr-pro" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -371,19 +363,11 @@
               <item name="sonarr-pro" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="renderer" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="sonarr-pro" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sonarr-pro" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="renderer" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -396,19 +380,19 @@
     <property name="ts.external.directory.path" value="C:\Users\shemi\AppData\Local\JetBrains\Toolbox\apps\WebStorm\ch-0\182.4892.25\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\VM\Apps\sonarr-pro\src\renderer\assets\icons" />
-      <recent name="D:\VM\Apps\sonarr-pro\src\main\App\Drivers" />
-      <recent name="D:\VM\Apps\sonarr-pro\src\main\Controllers" />
-      <recent name="D:\VM\Apps\sonarr-pro\src\main\App\Controllers" />
-      <recent name="D:\VM\Apps\sonarr-pro\src\main" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\VM\Apps\sonarr-pro\src\renderer\scss\fontawesome" />
       <recent name="D:\VM\Apps\sonarr-pro\src\renderer\assets\fonts" />
       <recent name="D:\VM\Apps\sonarr-pro\src\main\App\Drivers" />
       <recent name="D:\VM\Apps\sonarr-pro\src\utils\Exceptions" />
       <recent name="D:\VM\Apps\sonarr-pro\src\main" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\VM\Apps\sonarr-pro\src\renderer\components\DataTable\Scrollbar" />
+      <recent name="D:\VM\Apps\sonarr-pro\src\renderer\assets\icons" />
+      <recent name="D:\VM\Apps\sonarr-pro\src\main\App\Drivers" />
+      <recent name="D:\VM\Apps\sonarr-pro\src\main\Controllers" />
+      <recent name="D:\VM\Apps\sonarr-pro\src\main\App\Controllers" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -464,32 +448,33 @@
       <workItem from="1540661041036" duration="14213000" />
       <workItem from="1540755740142" duration="10000" />
       <workItem from="1540755762217" duration="1138000" />
-      <workItem from="1540909426531" duration="32200000" />
+      <workItem from="1540909426531" duration="32400000" />
+      <workItem from="1541008959198" duration="9978000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="443599000" />
+    <option name="totallyTimeSpent" value="453777000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24973656" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24973656" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Favorites" order="3" side_tool="true" />
-      <window_info anchor="bottom" id="TypeScript" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.329718" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.329718" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.329718" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Docker" order="10" show_stripe_button="false" />
+      <window_info anchor="bottom" id="TypeScript" order="11" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -503,145 +488,10 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/node_modules/mysql-crud-parser/lib/option.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-60">
-          <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/App/ColumnsCollection.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="40">
-          <caret line="3" column="54" selection-start-line="3" selection-start-column="54" selection-end-line="3" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/Service.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="46" column="15" lean-forward="true" selection-start-line="46" selection-start-column="15" selection-end-line="46" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/App/Drivers/mysql.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="58" column="29" selection-start-line="58" selection-start-column="29" selection-end-line="58" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/App/Connection.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="76" column="20" selection-start-line="76" selection-start-column="10" selection-end-line="76" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/App/App.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="11" column="31" selection-start-line="11" selection-start-column="31" selection-end-line="11" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#32#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/App/Service.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="18" column="21" lean-forward="true" selection-start-line="18" selection-start-column="21" selection-end-line="18" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/Tabs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="17" column="43" lean-forward="true" selection-start-line="17" selection-start-column="43" selection-end-line="17" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/App/Table.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="33" column="45" lean-forward="true" selection-start-line="33" selection-start-column="45" selection-end-line="33" selection-end-column="45" />
-          <folding>
-            <element signature="e#0#52#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/tab.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="3" column="20" selection-start-line="3" selection-start-column="20" selection-end-line="3" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#32#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/renderer/Tab.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="132" column="28" lean-forward="true" selection-start-line="132" selection-start-column="28" selection-end-line="132" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/renderer/Connection.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="21" column="47" lean-forward="true" selection-start-line="21" selection-start-column="47" selection-end-line="21" selection-end-column="47" />
-          <folding>
-            <element signature="e#0#56#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/Controllers/TabsController.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="21" column="36" selection-start-line="21" selection-start-column="36" selection-end-line="21" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#38#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/renderer/Service.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="16" column="30" selection-start-line="16" selection-start-column="30" selection-end-line="16" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/renderer/components/DataTable/DataTableHeader.vue">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="920">
           <caret line="52" column="48" selection-start-line="52" selection-start-column="36" selection-end-line="52" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/renderer/components/DataTable/DataTable.vue">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="249" column="25" selection-start-line="249" selection-start-column="25" selection-end-line="249" selection-end-column="25" />
-          <folding>
-            <element signature="e#1086#1134#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -738,9 +588,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="160">
           <caret line="8" column="74" selection-start-line="8" selection-start-column="74" selection-end-line="8" selection-end-column="74" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -748,28 +595,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2575">
           <caret line="147" column="41" selection-start-line="147" selection-start-column="41" selection-end-line="147" selection-end-column="41" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/codemirror/lib/codemirror.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
-        </state>
-      </provider>
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/codemirror/addon/hint/show-hint.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="9" column="20" lean-forward="true" selection-start-line="9" selection-start-column="20" selection-end-line="9" selection-end-column="20" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -791,9 +626,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="9" column="20" lean-forward="true" selection-start-line="9" selection-start-column="20" selection-end-line="9" selection-end-column="20" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -808,9 +640,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="160">
           <caret line="8" column="34" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="34" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -881,6 +710,101 @@
           <caret line="103" column="28" lean-forward="true" selection-start-line="103" selection-start-column="28" selection-end-line="103" selection-end-column="28" />
           <folding>
             <element signature="e#0#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.electron-vue/webpack.renderer.config.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="460">
+          <caret line="128" column="38" selection-start-line="128" selection-start-column="38" selection-end-line="128" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/element-ui/lib/utils/scroll-into-view.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/element-ui/lib/utils/scrollbar-width.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="32" column="7" selection-start-line="32" selection-start-column="7" selection-end-line="32" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/element-ui/lib/utils/util.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1970" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/element-ui/lib/scrollbar.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2460" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/element-ui/src/utils/scroll-into-view.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/element-ui/src/utils/scrollbar-width.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/element-ui/src/utils/util.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1790" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/element-ui/packages/scrollbar/src/util.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/element-ui/packages/scrollbar/src/main.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-470">
+          <caret line="9" column="22" lean-forward="true" selection-start-line="9" selection-start-column="22" selection-end-line="9" selection-end-column="22" />
+          <folding>
+            <element signature="e#83#175#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/renderer/components/DataTable/Scrollbar/util.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/element-ui/lib/utils/popper.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="299">
+          <caret line="226" column="4" selection-start-line="226" selection-start-column="4" selection-end-line="226" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/renderer/components/DataTable/Scrollbar/bar.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="700">
+          <caret line="41" column="26" lean-forward="true" selection-start-line="41" selection-start-column="26" selection-end-line="41" selection-end-column="26" />
+          <folding>
+            <element signature="e#45#96#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/renderer/components/DataTable/DataTable.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="40">
+          <caret line="2" column="30" selection-start-line="2" selection-start-column="30" selection-end-line="2" selection-end-column="30" />
+          <folding>
+            <element signature="e#1365#1413#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/renderer/components/DataTable/Scrollbar/main.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="427">
+          <caret line="113" column="25" lean-forward="true" selection-start-line="113" selection-start-column="25" selection-end-line="113" selection-end-column="25" />
+          <folding>
+            <element signature="e#617#707#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -11,7 +11,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 
 /**
  * List of node_modules to include in webpack bundle
@@ -127,19 +126,7 @@ let rendererConfig = {
     new webpack.HotModuleReplacementPlugin({
         dynamicPublicPath: true
     }),
-    new webpack.NoEmitOnErrorsPlugin(),
-    new MonacoWebpackPlugin({
-        languages: ['mysql', 'pgsql', 'sql'],
-        features: [
-            '!links',
-            '!goToDefinitionMouse',
-            '!goToDefinitionCommands',
-            '!referenceSearch',
-            '!gotoError',
-            '!comment',
-            '!colorDetector'
-        ]
-    })
+    new webpack.NoEmitOnErrorsPlugin()
   ],
   output: {
     filename: '[name].js',

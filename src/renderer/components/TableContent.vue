@@ -114,8 +114,6 @@
                     return;
                 }
 
-                console.log('start query');
-
                 this.loading = true;
                 this.loaded = true;
 

@@ -1,40 +1,46 @@
 <template>
 
-    <div class="snr-data-table" v-loading="loading">
-        <div class="snr-data-table-wrap" :style="wrapStyle">
-            <data-table-header :columns="columns"
-                               :is-sortable="sortable"
-                               @update-style="updateWidth"
-                               :order="order">
-            </data-table-header>
+    <scrollbar ref="scrollbar">
+        <div class="snr-data-table" v-loading="loading">
+            <div class="snr-data-table-wrap"
+                 @scroll="$refs.scrollbar && $refs.scrollbar.handleScroll($event)"
+                 ref="widthElement" :style="wrapStyle">
+                <data-table-header :columns="columns"
+                                   :is-sortable="sortable"
+                                   @update-style="updateWidth"
+                                   :order="order">
+                </data-table-header>
 
-            <div class="data-table-content"
-                 :style="contentStyle"
-                 ref="contentEl">
+                <div class="data-table-content"
+                     :style="contentStyle"
+                     ref="contentEl">
 
-                <virtual-list v-show="scrollReady && content.length > 0 && ! loading"
-                              :size="rowSize"
-                              :remain="remainRows"
-                              :bench="rowsBench"
-                              v-if="scrollReady"
-                              :tobottom="loadMore"
-                              class="data-table-content-holder">
+                    <virtual-list v-show="scrollReady && content.length > 0 && ! loading"
+                                  :size="rowSize"
+                                  :remain="remainRows"
+                                  :bench="rowsBench"
+                                  v-if="scrollReady"
+                                  @scroll.native="$refs.scrollbar && $refs.scrollbar.handleScroll($event)"
+                                  ref="heightElement"
+                                  :tobottom="loadMore"
+                                  class="data-table-content-holder">
 
-                    <data-table-row
-                            v-for="(row, index) in content"
-                            :key="index"
-                            :row="row"
-                            :cells-style="cellsStyle"
-                            :columns="columns">
-                    </data-table-row>
+                        <data-table-row
+                                v-for="(row, index) in content"
+                                :key="index"
+                                :row="row"
+                                :cells-style="cellsStyle"
+                                :columns="columns">
+                        </data-table-row>
 
-                </virtual-list>
+                    </virtual-list>
 
+                </div>
+
+                <resize-observer @notify="handleResize" />
             </div>
-
-            <resize-observer @notify="handleResize" />
         </div>
-    </div>
+    </scrollbar>
 
 </template>
 
@@ -43,6 +49,7 @@
     import DataTableRow from './DataTableRow';
     import VirtualList from 'vue-virtual-scroll-list';
     import debounce from 'lodash/debounce';
+    import Scrollbar from './Scrollbar/main';
 
     function getScrollbarWidth() {
         var outer = document.createElement("div");
@@ -129,8 +136,6 @@
 
         mounted() {
             this.updateList();
-
-            console.log(this.wrapStyle);
         },
 
         methods: {
@@ -145,6 +150,10 @@
 
                 this.$nextTick(() => {
                     this.scrollReady = true;
+
+                    if(this.$refs.scrollbar) {
+                        this.$refs.scrollbar.update();
+                    }
                 });
             },
 
@@ -158,6 +167,12 @@
                 }
 
                 this.$set(this.cellsStyle[cellIndex], 'width', width);
+
+                if(this.$refs.scrollbar) {
+                    this.$nextTick(() => {
+                        this.$refs.scrollbar.update();
+                    });
+                }
             },
 
             loadMore() {
@@ -166,13 +181,20 @@
 
             updateWidth(width) {
                 this.contentStyle.width = (getScrollbarWidth() + width) + 'px';
+
+                if(this.$refs.scrollbar) {
+                    this.$nextTick(() => {
+                        this.$refs.scrollbar.update();
+                    });
+                }
             }
         },
 
         components: {
             DataTableHeader,
             DataTableRow,
-            VirtualList
+            VirtualList,
+            Scrollbar
         }
 
     }

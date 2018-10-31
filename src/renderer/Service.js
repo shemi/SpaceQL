@@ -42,8 +42,6 @@ class Service {
     }
 
     sendTo(tabID, route, ...dataArgs) {
-        console.log(tabID, route);
-
         return new Promise((resolve, reject) => {
             const replyChannel = `${route}#${uuid()}`;
             let timeout;
@@ -104,8 +102,6 @@ class Service {
                 else if(returnData && returnData.message) {
                     error = new Error(returnData.message);
                 }
-
-                console.log(returnData);
 
                 return reject(error);
             default:
