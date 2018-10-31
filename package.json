@@ -1,7 +1,7 @@
 {
   "name": "SpaceQL",
   "productName": "SpaceQL",
-  "version": "0.0.1",
+  "version": "0.0.1-alpha.2",
   "author": "shemi perez <shemi.perez@gmail.com>",
   "description": "An electron-vue project",
   "license": "(ISC OR GPL-3.0)",
