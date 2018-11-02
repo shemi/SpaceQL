@@ -21,12 +21,14 @@ export default class Stateable {
         Vue.set(this.state, key, value);
     }
 
-    getState(key = null) {
+    getState(key = null, defaultValue = null) {
         if(! key) {
             return this.state;
         }
 
-        return this.state[key];
+        let value = this.state[key];
+
+        return value === undefined ? defaultValue : value;
     }
 
     static createState() {

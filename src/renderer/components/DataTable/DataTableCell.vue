@@ -36,7 +36,7 @@
         watch: {
             column: {
                 handler() {
-                    console.log(this.column);
+
                 },
                 deep: true,
                 immediate: true

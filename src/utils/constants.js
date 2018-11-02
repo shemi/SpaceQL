@@ -1,4 +1,5 @@
 export const FAVORITES_STORE_KEY = 'favorites';
+export const PREFERENCES_STORE_KEY = 'preferences';
 
 export const COLORS = [
     {name: 'None', color: 'black'},

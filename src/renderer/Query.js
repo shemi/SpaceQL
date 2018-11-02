@@ -52,9 +52,11 @@ class QueryResultSet extends Stateable {
 
 }
 
-export default class Query {
+export default class Query extends Stateable {
 
     constructor(database) {
+        super();
+
         this.database = database;
         this.resultsSets = [];
         this.append = false;
@@ -135,6 +137,13 @@ export default class Query {
 
     get tabId() {
         return this.database.tabId;
+    }
+
+    static createState() {
+        return {
+            splitTop: 40,
+            splitBottom: 60,
+        }
     }
 
 }

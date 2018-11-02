@@ -30,7 +30,9 @@
                                     :chunks-id="set.chunksId"
                                     :total="set.total"
                                     ref="dataTables"
+                                    @scroll="handleScroll($event, set)"
                                     @load-next="handelLoadMore(set)"
+                                    :scroll-pos="getSetScrollPos(set)"
                                     :content="set.rows">
                         </data-table>
 
@@ -50,6 +52,7 @@
     import DataTable from './DataTable/DataTable';
     import MainFooter from "./MainFooter";
     import CodeMirror from "./CodeMirror/CodeMirror";
+    import debounce from 'lodash/debounce';
 
     export default {
 
@@ -93,6 +96,25 @@
                         }
                     }
                 });
+            },
+
+            handleScroll: debounce(function(pos, set) {
+                set.setState('scrollTop', pos.top);
+                set.setState('scrollLeft', pos.left);
+            }, 80),
+
+            getSetScrollPos(set) {
+                if(! set || ! set.getState) {
+                    return {
+                        top: 0,
+                        left: 0
+                    }
+                }
+
+                return {
+                    top: set.getState('scrollTop', 0),
+                    left: set.getState('scrollLeft', 0)
+                };
             },
 
             onDrag() {
