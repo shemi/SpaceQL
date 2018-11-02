@@ -1,6 +1,7 @@
 import TablesCollection from "./TablesCollection";
 import Service from "./Service";
 import Query from "./Query";
+import Vue from "vue";
 
 export default class Database {
 
@@ -20,6 +21,7 @@ export default class Database {
         this.query = new Query(this);
 
         this.loadingTables = false;
+        this.selectFirstTable();
     }
 
     selectFirstTable() {
@@ -27,7 +29,19 @@ export default class Database {
             return;
         }
 
-        this.selectedTable = this.tables.first();
+        this.selectTable(this.tables.first());
+    }
+
+    selectTable(table) {
+        if(typeof table === 'string') {
+            table = this.tables.first({name: table});
+        }
+
+        if(this.selectedTable) {
+            this.selectedTable.resetScroll();
+        }
+
+        Vue.set(this, 'selectedTable', table);
     }
 
     async loadTables(refresh = false) {
@@ -48,7 +62,15 @@ export default class Database {
         this.tablesLoaded = true;
         this.loadingTables = false;
 
+        this.selectFirstTable();
+
         return this;
+    }
+
+    deactivated() {
+        this.tables.each(table => {
+            table.resetScroll();
+        });
     }
 
     get toAutocomplete() {

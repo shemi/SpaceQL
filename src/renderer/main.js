@@ -15,6 +15,7 @@ import "./scss/app.scss";
 import VueResize from 'vue-resize';
 
 import VueVirtualScroller from 'vue-virtual-scroller';
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 if (!process.env.IS_WEB) {
     Vue.use({

@@ -1,5 +1,6 @@
 import ResultSetHead from "./ResultSetHead";
 import RowsChunks from './RowsChunks';
+import uuid from 'uuid/v4';
 
 class ResultSet {
 
@@ -9,12 +10,19 @@ class ResultSet {
         this.columns = null;
         this.statement = statement;
         this.chunkId = null;
+        this.setId = uuid();
     }
 
-    setRows(rows, columns) {
-        this.columns = columns;
+    setRows(rows, columns = []) {
+        let ri;
 
-        if(rows.length > RowsChunks.getRowsPerChunk()) {
+        this.setColumns(columns);
+
+        for (ri = 0; ri < rows.length; ri++) {
+            rows[ri].__spqlInternalRowId = 's_'+ this.setId +'r_'+ ri;
+        }
+
+        if (rows.length > RowsChunks.getRowsPerChunk()) {
             let chunk = RowsChunks.create(rows);
 
             this.chunkId = chunk.id;
@@ -26,6 +34,28 @@ class ResultSet {
         this.closeHead({rowsCount: rows.length});
 
         return this;
+    }
+
+    setColumns(columns) {
+        if(! Array.isArray(columns)) {
+            return;
+        }
+
+        columns = columns.map((column, index) => {
+            if(typeof column !== 'object') {
+                return column;
+            }
+
+            if(typeof column.inspect === 'function') {
+                column = column.inspect();
+            }
+
+            column.__spqlInternalId = 's_'+ this.setId +'c_'+ index;
+
+            return column;
+        });
+
+        this.columns = columns;
     }
 
     closeHead(data) {

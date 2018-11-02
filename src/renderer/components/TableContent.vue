@@ -46,6 +46,8 @@
         <div class="data-table-section">
             <data-table :columns="columns" sortable editable
                         :loading="loading"
+                        :scroll-pos="scrollPos"
+                        @scroll="handleScroll"
                         :content="content">
             </data-table>
         </div>
@@ -58,6 +60,7 @@
     import DataTable from './DataTable/DataTable';
     import GeneralComputedMixin from '../mixins/GeneralComputedMixin';
     import {QUERY_OPRATORS} from "../../utils/constants";
+    import debounce from 'lodash/debounce';
 
     const createQueryForm = () => {
         return {
@@ -109,6 +112,11 @@
                 this.fetchContent(true);
             },
 
+            handleScroll: debounce(function(pos) {
+                this.table.setState('scrollTop', pos.top);
+                this.table.setState('scrollLeft', pos.left);
+            }, 80),
+
             fetchContent() {
                 if(! this.table) {
                     return;
@@ -128,6 +136,20 @@
         },
 
         computed: {
+
+            scrollPos() {
+                if(! this.table) {
+                    return {
+                        top: 0,
+                        left: 0
+                    }
+                }
+
+                return {
+                    top: this.table.getState('scrollTop'),
+                    left: this.table.getState('scrollLeft')
+                }
+            },
 
             columns() {
                 return this.table ? this.table.columns.all() : [];

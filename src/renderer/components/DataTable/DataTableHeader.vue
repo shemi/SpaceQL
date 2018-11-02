@@ -50,7 +50,7 @@
             this.observer = new MutationObserver((mutationsList, observer) => {
                 for(let mutation of mutationsList) {
                     if(mutation.attributeName === 'style') {
-                        this.$emit('update-style', this.$refs.headerRow.getBoundingClientRect().width);
+                        this.$emit('update-style', this.$refs.headerRow.clientWidth);
                     }
                 }
             });

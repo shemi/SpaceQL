@@ -3,8 +3,10 @@
     <scrollbar ref="scrollbar">
         <div class="snr-data-table" v-loading="loading">
             <div class="snr-data-table-wrap"
-                 @scroll="$refs.scrollbar && $refs.scrollbar.handleScroll($event)"
-                 ref="widthElement" :style="wrapStyle">
+                 @scroll="handleScroll"
+                 ref="widthElement"
+                 :style="wrapStyle">
+
                 <data-table-header :columns="columns"
                                    :is-sortable="sortable"
                                    @update-style="updateWidth"
@@ -15,25 +17,25 @@
                      :style="contentStyle"
                      ref="contentEl">
 
-                    <virtual-list v-show="scrollReady && content.length > 0 && ! loading"
-                                  :size="rowSize"
-                                  :remain="remainRows"
-                                  :bench="rowsBench"
-                                  v-if="scrollReady"
-                                  @scroll.native="$refs.scrollbar && $refs.scrollbar.handleScroll($event)"
-                                  ref="heightElement"
-                                  :tobottom="loadMore"
-                                  class="data-table-content-holder">
+                        <recycle-scroller
+                                class="data-table-content-holder"
+                                :items="content"
+                                :item-height="rowSize"
+                                ref="heightElement"
+                                @scroll.native="handleScroll"
+                                keyField="__spqlInternalRowId"
+                                :buffer="rowsBench"
+                        >
 
-                        <data-table-row
-                                v-for="(row, index) in content"
-                                :key="index"
-                                :row="row"
+                            <data-table-row
+                                slot-scope="{item}"
+                                :row="item"
+                                :table-id="randomId"
                                 :cells-style="cellsStyle"
                                 :columns="columns">
-                        </data-table-row>
+                            </data-table-row>
 
-                    </virtual-list>
+                        </recycle-scroller>
 
                 </div>
 
@@ -45,36 +47,14 @@
 </template>
 
 <script>
+    import uuid from 'uuid/v4';
     import DataTableHeader from './DataTableHeader';
     import DataTableRow from './DataTableRow';
     import VirtualList from 'vue-virtual-scroll-list';
     import debounce from 'lodash/debounce';
+    import scrollbarWidth from 'element-ui/src/utils/scrollbar-width';
     import Scrollbar from './Scrollbar/main';
-
-    function getScrollbarWidth() {
-        var outer = document.createElement("div");
-        outer.style.visibility = "hidden";
-        outer.style.width = "100px";
-        outer.style.msOverflowStyle = "scrollbar"; // needed for WinJS apps
-
-        document.body.appendChild(outer);
-
-        var widthNoScroll = outer.offsetWidth;
-        // force scrollbars
-        outer.style.overflow = "scroll";
-
-        // add innerdiv
-        var inner = document.createElement("div");
-        inner.style.width = "100%";
-        outer.appendChild(inner);
-
-        var widthWithScroll = inner.offsetWidth;
-
-        // remove divs
-        outer.parentNode.removeChild(outer);
-
-        return widthNoScroll - widthWithScroll;
-    }
+    import RecycleScroller from "vue-virtual-scroller/src/components/RecycleScroller";
 
     export default {
 
@@ -97,6 +77,10 @@
             loading: {
                 type: Boolean,
                 default: false
+            },
+            scrollPos: {
+                type: Object,
+                default:  {top: 0, left: 0}
             }
         },
 
@@ -108,6 +92,7 @@
 
         data() {
             return {
+                randomId: uuid(),
                 order: {},
                 cellsStyle: {},
                 rows: this.content,
@@ -116,8 +101,8 @@
                 remainRows: 0,
                 contentStyle: {width: '100%'},
                 wrapStyle: {
-                    width: `calc(100% + ${getScrollbarWidth()}px)`,
-                    height: `calc(100% + ${getScrollbarWidth()}px)`
+                    width: `calc(100% + ${scrollbarWidth()}px)`,
+                    height: `calc(100% + ${scrollbarWidth()}px)`
                 },
                 rowsBench: 0
             }
@@ -129,8 +114,8 @@
             },
 
             columns() {
-                this.updateList();
                 this.resetCellsStyles();
+                this.updateList();
             }
         },
 
@@ -143,13 +128,38 @@
                 this.updateList();
             }, 150),
 
+            handleScroll(e) {
+                if(this.$refs.scrollbar) {
+                    this.$refs.scrollbar.handleScroll(e);
+                }
+
+                if(! this.heightElement || ! this.widthElement) {
+                    return;
+                }
+
+                this.$emit('scroll', {
+                    top: this.heightElement.scrollTop,
+                    left: this.widthElement.scrollLeft,
+                });
+            },
+
             updateList() {
-                this.scrollReady = false;
-                this.remainRows = Math.floor(this.$refs.contentEl.getBoundingClientRect().height / this.rowSize);
+                this.remainRows = Math.floor(this.$refs.contentEl.clientHeight / this.rowSize);
                 this.rowsBench = this.remainRows * 4;
+                this.randomId = uuid();
 
                 this.$nextTick(() => {
-                    this.scrollReady = true;
+                    if(this.heightComponent) {
+                        if(this.heightComponent.ready) {
+                            this.heightComponent.updateVisibleItems(false);
+                        }
+
+                        this.heightComponent.scrollToPosition(this.scrollPos.top || 0);
+                    }
+
+                    if(this.widthElement) {
+                        this.widthElement.scrollLeft = this.scrollPos.left || 0;
+                    }
 
                     if(this.$refs.scrollbar) {
                         this.$refs.scrollbar.update();
@@ -168,11 +178,11 @@
 
                 this.$set(this.cellsStyle[cellIndex], 'width', width);
 
-                if(this.$refs.scrollbar) {
-                    this.$nextTick(() => {
+                this.$nextTick(() => {
+                    if(this.$refs.scrollbar) {
                         this.$refs.scrollbar.update();
-                    });
-                }
+                    }
+                });
             },
 
             loadMore() {
@@ -180,17 +190,38 @@
             },
 
             updateWidth(width) {
-                this.contentStyle.width = (getScrollbarWidth() + width) + 'px';
+                this.contentStyle.width = (scrollbarWidth() + width) + 'px';
 
-                if(this.$refs.scrollbar) {
-                    this.$nextTick(() => {
+                this.$nextTick(() => {
+                    if(this.$refs.scrollbar) {
                         this.$refs.scrollbar.update();
-                    });
-                }
+                    }
+                });
+            }
+        },
+
+        computed: {
+            heightComponent() {
+                return this.$refs.heightElement;
+            },
+
+            widthComponent() {
+                return this.$refs.widthElement;
+            },
+
+            heightElement() {
+                return this.heightComponent && this.heightComponent.$el ?
+                    this.heightComponent.$el : this.heightComponent;
+            },
+
+            widthElement() {
+                return this.widthComponent && this.widthComponent.$el ?
+                    this.widthComponent.$el : this.widthComponent;
             }
         },
 
         components: {
+            RecycleScroller,
             DataTableHeader,
             DataTableRow,
             VirtualList,
@@ -239,6 +270,8 @@
             flex-grow: 1;
             flex-shrink: 1;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .data-table-row {

@@ -21,6 +21,7 @@
                 type: Boolean,
                 default: false
             },
+            column: Object,
             rowIndex: Number,
             cellIndex: Number,
             cellStyle: Object
@@ -29,6 +30,16 @@
         data() {
             return {
 
+            }
+        },
+
+        watch: {
+            column: {
+                handler() {
+                    console.log(this.column);
+                },
+                deep: true,
+                immediate: true
             }
         },
 

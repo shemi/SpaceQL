@@ -1,5 +1,6 @@
 import DatabasesCollection from "./DatabasesCollection";
 import Service from "./Service";
+import Vue from "vue";
 
 export default class Connection {
 
@@ -34,17 +35,18 @@ export default class Connection {
         return this.databases.isNotEmpty() ? this.databases.first() : null;
     }
 
-    select(name) {
-        this.selectedDatabase = this.databases.find({name});
+    async select(name) {
+        const database = this.databases.find({name});
 
-        if(! this.selectedDatabase) {
+        if(! database) {
             return;
         }
 
-        this.selectedDatabase.loadTables()
-            .catch(err => {
-                console.error(err);
-            });
+        if(this.selectedDatabase) {
+            this.selectedDatabase.deactivated();
+        }
+
+        return await database.loadTables();
     }
 
     setTab(tab) {

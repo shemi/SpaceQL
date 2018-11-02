@@ -1,9 +1,12 @@
 import Service from "./Service";
 import Vue from 'vue';
+import Stateable from "../utils/Stateable";
 
-class QueryResultSet {
+class QueryResultSet extends Stateable {
 
     constructor(tabId, rows, columns, chunkId, total, index) {
+        super();
+
         this.rows = rows || [];
         this.columns = columns || [];
         this.chunkId = chunkId;
@@ -38,6 +41,13 @@ class QueryResultSet {
                 this.loadingMore = false;
             })
             .catch(err => console.log(err));
+    }
+
+    static createState() {
+        return {
+            scrollTop: 0,
+            scrollLeft: 0,
+        }
     }
 
 }

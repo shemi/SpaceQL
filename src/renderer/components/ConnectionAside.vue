@@ -28,7 +28,11 @@
 
         methods: {
             selectTable(table) {
-                this.$set(this.database, 'selectedTable', table);
+                if(! this.database) {
+                    return;
+                }
+
+                this.database.selectTable(table);
             }
         },
 
