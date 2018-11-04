@@ -13,7 +13,9 @@
         <div class="snr-query-wrap">
             <div ref="topWindow" class="query-editor">
                 <code-mirror v-model="queryString"
-                             :options="editorOptions">
+                             :options="editorOptions"
+                             :doc="editorDoc"
+                             @update-doc="onUpdateEditorDoc">
                 </code-mirror>
             </div>
 
@@ -53,38 +55,34 @@
     import MainFooter from "./MainFooter";
     import CodeMirror from "./CodeMirror/CodeMirror";
     import debounce from 'lodash/debounce';
+    import GeneralComputedMixin from '../mixins/GeneralComputedMixin';
 
     export default {
+
+        mixins: [GeneralComputedMixin],
 
         data() {
             return {
                 activeTab: '1',
                 loading: false,
                 queryString: '',
+                pageSplit: null,
+                editorDocCopy: null
             }
         },
 
         mounted() {
             this.initPageSplit();
-
-            if(this.query) {
-                this.queryString = this.query.lastSql;
-
-                if(this.$refs.dataTables && this.$refs.dataTables[this.query.selectedTab]) {
-                    this.$nextTick(() => {
-                        this.$refs.dataTables[this.query.selectedTab].updateList();
-                    });
-                }
-            }
         },
 
         methods: {
             initPageSplit() {
-                Split([this.$refs.topWindow, this.$refs.bottomWindow], {
+                this.pageSplit = Split([this.$refs.topWindow, this.$refs.bottomWindow], {
                     direction: 'vertical',
-                    sizes: [40, 60],
+                    sizes: this.query.getState('split'),
                     minSize: [50, 50],
                     onDrag: this.onDrag.bind(this),
+                    onDragEnd: this.onDragEnd.bind(this),
                     elementStyle(dimension, size, gutterSize) {
                         return {
                             'height': 'calc(' + size + '% - ' + gutterSize + 'px)'
@@ -117,12 +115,24 @@
                 };
             },
 
-            onDrag() {
+            onDrag(e) {
                 if(! this.$refs.editor) {
                     return;
                 }
 
                 this.$refs.editor.refresh();
+            },
+
+            onDragEnd(sizes) {
+                if(! this.pageSplit) {
+                    return;
+                }
+
+                this.query.setState('split', this.pageSplit.getSizes());
+            },
+
+            onUpdateEditorDoc(doc) {
+                this.query.setState('doc', doc);
             },
 
             exec() {
@@ -149,26 +159,13 @@
         },
 
         computed: {
-            tab() {
-                return this.$store.getters['Tabs/getTabById'](
-                    parseInt(this.$route.params.tabId)
-                );
-            },
-
-            tabId() {
-                return this.tab ? this.tab.id : '';
-            },
-
-            connection() {
-                return this.tab ? this.tab.connection : null;
-            },
-
-            database() {
-                return this.connection ? this.connection.selectedDatabase : null;
-            },
 
             query() {
                 return this.database ? this.database.query : null;
+            },
+
+            editorDoc() {
+                return this.query ? this.query.getState('doc') : null;
             },
 
             editorOptions() {

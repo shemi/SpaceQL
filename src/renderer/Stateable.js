@@ -1,4 +1,5 @@
 import Vue from "vue";
+import Service from './Service';
 
 export default class Stateable {
 
@@ -18,6 +19,13 @@ export default class Stateable {
             return;
         }
 
+        const storeKey = this.getStateSettings().storeKey,
+            keysToStore = this.getStateSettings().keysToStore;
+
+        if(storeKey && keysToStore.indexOf(key) >= 0) {
+            Service.setPreference(`${storeKey}.${key}`, value);
+        }
+
         Vue.set(this.state, key, value);
     }
 
@@ -29,6 +37,13 @@ export default class Stateable {
         let value = this.state[key];
 
         return value === undefined ? defaultValue : value;
+    }
+
+    getStateSettings() {
+        return {
+            storeKey: this.constructor.name.toLowerCase(),
+            keysToStore: []
+        }
     }
 
     static createState() {

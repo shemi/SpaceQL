@@ -1,6 +1,6 @@
 import Collection from "../utils/Collection";
 import Service from "./Service";
-import Stateable from "../utils/Stateable";
+import Stateable from "./Stateable";
 
 export default class Table extends Stateable {
 

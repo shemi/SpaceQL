@@ -1,12 +1,16 @@
 export default {
 
-    computed: {
+    data() {
+        return {
+            tab: null
+        }
+    },
 
-        tab() {
-            return this.$store.getters['Tabs/getTabById'](
-                parseInt(this.$route.params.tabId)
-            );
-        },
+    created() {
+        this.tab = this.$store.getters['Tabs/getTabById'](parseInt(this.$route.params.tabId));
+    },
+
+    computed: {
 
         tabId() {
             return this.tab ? this.tab.id : '';

@@ -1,6 +1,7 @@
 <template>
 
-    <div class="connection-aside-container aside-container">
+    <div class="connection-aside-container aside-container"
+         v-loading="database.loadingTables">
 
 
         <div class="aside-list" v-if="tables">
@@ -48,8 +49,12 @@
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     @import "../scss/variables";
+
+    .connection-aside-container {
+        height: 100%;
+    }
 
     .aside-item {
         color: black;

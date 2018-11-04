@@ -63,6 +63,10 @@
             globalEvents: {
                 type: Array,
                 default: () => ([])
+            },
+
+            doc: {
+                type: Object
             }
         },
 
@@ -82,6 +86,16 @@
 
             value(newVal) {
                 this.handelCodeChange(newVal);
+            },
+
+            doc: {
+                immediate: true,
+                deep: false,
+                handler(doc) {
+                    if(doc && doc.history && this.cmInstance) {
+                        this.updateDoc();
+                    }
+                }
             },
         },
 
@@ -140,9 +154,27 @@
 
                 this.cmInstance.on('inputRead', this.autoCompleteOnInputRead.bind(this));
                 this.cmInstance.focus();
+
+                this.updateDoc();
                 this.$emit('ready', this.codeMirror);
+
                 this.unseenLineMarkers();
                 this.refresh();
+            },
+
+            updateDoc() {
+                if(! this.doc) {
+                    return;
+                }
+
+                this.cmInstance.swapDoc(this.doc);
+
+                this.content = this.cmInstance.getValue();
+                this.$emit('input', this.content);
+
+                const scrollInfo = this.cmInstance.getScrollInfo();
+
+                this.cmInstance.scrollTo(scrollInfo.left, scrollInfo.top);
             },
 
             autoCompleteOnInputRead() {
@@ -174,6 +206,14 @@
             },
 
             destroy() {
+                if(this.cmInstance.getDoc()) {
+                    this.$emit('update-doc', this.cmInstance.getDoc().copy(true));
+                }
+
+                if(this.cmInstance.toTextArea) {
+                    this.cmInstance.toTextArea();
+                }
+
                 const element = this.cmInstance.doc.cm.getWrapperElement();
 
                 element && element.remove && element.remove();
@@ -207,11 +247,11 @@
         },
 
         mounted() {
-            this.initialize()
+            this.initialize();
         },
 
         beforeDestroy() {
-            this.destroy()
+            this.destroy();
         }
     }
 

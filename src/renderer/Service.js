@@ -109,6 +109,14 @@ class Service {
         }
     }
 
+    getPreference(key, defaultValue = null) {
+        return ipcRenderer.sendSync('getPreferences', key, defaultValue);
+    }
+
+    setPreference(key, value = null) {
+        return this.send('PreferencesController@set', key, value);
+    }
+
 }
 
 export default (new Service());

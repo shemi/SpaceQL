@@ -1,10 +1,13 @@
 import uuid from 'uuid/v4';
+import Preferences from "./Preferences";
 
 class Service {
 
     constructor(ipc, timeOut = null) {
         this.ipc = ipc;
         this.maxTimeoutMs = timeOut;
+
+        this.ipc.on('getPreferences', Service.getPreferences);
     }
 
     on(route, listener) {
@@ -55,16 +58,8 @@ class Service {
         });
     }
 
-
-    handelRequest(callback) {
-
-    }
-
-    responseSuccess(data) {
-
-    }
-
-    responseError(data) {
+    static getPreferences(event, key, defaultValue) {
+        event.returnValue = Preferences.instance().get(key, defaultValue);
 
     }
 

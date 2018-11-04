@@ -1,6 +1,6 @@
 import Service from "./Service";
 import Vue from 'vue';
-import Stateable from "../utils/Stateable";
+import Stateable from "./Stateable";
 
 class QueryResultSet extends Stateable {
 
@@ -139,10 +139,17 @@ export default class Query extends Stateable {
         return this.database.tabId;
     }
 
+    getStateSettings() {
+        return {
+            storeKey: 'query',
+            keysToStore: ['split']
+        }
+    }
+
     static createState() {
         return {
-            splitTop: 40,
-            splitBottom: 60,
+            split: Service.getPreference('query.split'),
+            doc: null
         }
     }
 

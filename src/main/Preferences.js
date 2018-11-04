@@ -3,6 +3,8 @@ import config from '../utils/config';
 import moment from 'moment';
 import defaultPreferences from '../utils/default_preferences';
 
+let instance;
+
 class Preferences {
 
     constructor() {
@@ -21,6 +23,7 @@ class Preferences {
         }
 
         for(let storeKey of Object.keys(key)) {
+            console.log('set param: ', key);
             this.store.set(storeKey, key[storeKey]);
         }
 
@@ -29,12 +32,20 @@ class Preferences {
 
     setDefaultsIfNew() {
         if(this.get('last_modified')) {
-           return {};
+           return;
         }
 
         this.set(defaultPreferences);
     }
 
+    static instance() {
+        if(! instance) {
+            instance = new Preferences();
+        }
+
+        return instance;
+    }
+
 }
 
-export default Favorite;
+export default Preferences;

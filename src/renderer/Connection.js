@@ -46,7 +46,9 @@ export default class Connection {
             this.selectedDatabase.deactivated();
         }
 
-        return await database.loadTables();
+        this.selectedDatabase = database;
+
+        return await this.selectedDatabase.loadTables();
     }
 
     setTab(tab) {
