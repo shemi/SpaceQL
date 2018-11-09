@@ -121,7 +121,11 @@ class MysqlDriver extends Driver {
             connection = await this.getConnection(),
             sets = [],
             statement,
-            [rowsSets, columnsSets] = await connection.query(sql, values),
+            [rowsSets, columnsSets] = await connection.query({
+                sql,
+                values,
+                nestTables: single ? false : '_'
+            }),
             index = 0;
 
         if(rowsSets && ! Array.isArray(rowsSets[0])) {
@@ -143,7 +147,7 @@ class MysqlDriver extends Driver {
         for(statement of crud.statements) {
             let rows = rowsSets[index];
             let columns = columnsSets[index];
-            let resultSet = new ResultSet(statement, start);
+            let resultSet = new ResultSet(statement, start, ! single);
 
             if(Array.isArray(rows) && columns) {
                 resultSet.setRows(rows, columns);
@@ -201,7 +205,8 @@ class MysqlDriver extends Driver {
         this.config = {
             ...config,
             multipleStatements: true,
-            dateStrings: true
+            dateStrings: true,
+            supportBigNumbers: true
         }
     }
 

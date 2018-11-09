@@ -126,12 +126,7 @@
 
 <script>
     import path from 'path';
-    import {
-        TEST_CONNECTION,
-        CONNECT
-    } from '../../utils/main-events';
     import { COLORS } from "../../utils/constants";
-    import service from '../Service';
     import { createNamespacedHelpers } from 'vuex';
     import Tab from '../Tab';
 
@@ -303,7 +298,11 @@
             },
 
             getFilePath(formKey, title = '', buttonLabel='Select', defaultPath = '') {
-                defaultPath = defaultPath || (this.form[formKey] || '');
+                if(! this.tab) {
+                    return;
+                }
+
+                defaultPath = defaultPath || (this.tab.connectionForm[formKey] || '');
 
                 if(defaultPath && typeof defaultPath === 'string') {
                     defaultPath = path.dirname(defaultPath);
@@ -321,7 +320,7 @@
                             return;
                         }
 
-                        this.$set(this.form, formKey, filePaths[0]);
+                        this.$set(this.tab.connectionForm, formKey, filePaths[0]);
                     }
                 );
             }

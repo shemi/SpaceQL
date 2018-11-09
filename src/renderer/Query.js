@@ -1,14 +1,25 @@
 import Service from "./Service";
 import Vue from 'vue';
 import Stateable from "./Stateable";
+import ColumnsCollection from "./ColumnsCollection";
+import RowCollection from "./RowCollection";
 
 class QueryResultSet extends Stateable {
 
-    constructor(tabId, rows, columns, chunkId, total, index) {
+    constructor(tabId, rows, columns, chunkId, total, index, databaseName) {
         super();
 
-        this.rows = rows || [];
-        this.columns = columns || [];
+        this.columns = new ColumnsCollection(columns || [], {
+            name: 'query-temp-table',
+            database: databaseName
+        });
+
+        this.rows = new RowCollection(rows || [], {
+            columns: this.columns,
+            table: 'query-temp-table',
+            database: databaseName
+        });
+
         this.chunkId = chunkId;
         this.total = total;
         this.hasMoreRows = !! chunkId;
@@ -18,29 +29,47 @@ class QueryResultSet extends Stateable {
         this.loadingMore = false;
     }
 
-    next() {
+    async next() {
         if(! this.hasMoreRows || this.loadingMore) {
             return;
         }
 
         this.loadingMore = true;
+        let rows;
 
-        Service.sendTo(this.tabId, 'QueryController@nextChunk', this.chunkId)
-            .then(rows => {
-                if(! rows || ! Array.isArray(rows)) {
-                    this.hasMoreRows = false;
-                    this.loadingMore = false;
+        try {
+            rows = await Service.sendTo(this.tabId, 'QueryController@nextChunk', this.chunkId);
+        }
 
-                    return;
-                }
+        catch (err) {
+            console.error(err);
 
-                for(let row of rows) {
-                    this.rows.push(row);
-                }
+            return;
+        }
 
-                this.loadingMore = false;
-            })
-            .catch(err => console.log(err));
+        if(! rows || ! Array.isArray(rows)) {
+            this.hasMoreRows = false;
+            this.loadingMore = false;
+
+            return;
+        }
+
+        for(let row of rows) {
+            this.rows.push(row);
+        }
+
+        this.loadingMore = false;
+    }
+
+    destroy() {
+        if(this.chunkId) {
+            Service.sendTo(this.tabId, 'QueryController@deleteChunk', this.chunkId)
+                .then(res => console.log(res))
+                .catch(err => console.log(err));
+        }
+
+        this.columns.deleteAll();
+        this.rows.deleteAll();
     }
 
     static createState() {
@@ -59,7 +88,6 @@ export default class Query extends Stateable {
 
         this.database = database;
         this.resultsSets = [];
-        this.append = false;
         this.sqlHistory = [];
         this.lastSql = '';
     }
@@ -67,21 +95,15 @@ export default class Query extends Stateable {
     async exec(sql) {
         this.lastSql = sql.trim();
 
-        if(this.append) {
-            this.sqlHistory.push(sql);
-        } else  {
-            this.clearSets();
-            this.sqlHistory.length = 0;
-        }
-
-        let sets = [];
+        this.clearSets();
+        this.sqlHistory.length = 0;
 
         try {
             let results = await Service.sendTo(this.tabId, 'QueryController@exec', this.database.name, sql),
                 set,
                 resultSetsIndex = 0;
 
-            for(let set of results) {
+            for(set of results) {
                 this.tab.log.info(set.head, this.database.name);
 
                 if(set.columns && set.columns.length > 0) {
@@ -91,7 +113,8 @@ export default class Query extends Stateable {
                         set.columns,
                         set.chunkId,
                         set.head.rowsCount,
-                        resultSetsIndex
+                        resultSetsIndex,
+                        this.database.name
                     ));
 
                     resultSetsIndex++;
@@ -108,27 +131,11 @@ export default class Query extends Stateable {
     }
 
     clearSets() {
-        for(let setIndex in this.resultsSets) {
-            if(! this.resultsSets[setIndex]) {
-                return;
-            }
-
-            this.deleteSet(setIndex);
+        for(let set of this.resultsSets) {
+            set.destroy();
         }
 
-        this.resultsSets.length = 0;
-    }
-
-    deleteSet(setIndex) {
-        let set = this.resultsSets[setIndex];
-
-        if(set.chunkId) {
-            Service.send('QueryController@deleteChunk', set.chunkId)
-                .then(res => console.log(res))
-                .catch(err => console.log(err));
-        }
-
-        Vue.delete(this.resultsSets, setIndex);
+        this.resultsSets = [];
     }
 
     get tab() {

@@ -7,7 +7,7 @@
         <div class="cell-content">{{ column.name }}</div>
 
         <span class="caret-wrapper" v-if="isSortable">
-            <span class="caret-holder">
+            <span class="caret-holder" :class="caretClass">
                 <i class="sort-caret ascending"></i>
                 <i class="sort-caret descending"></i>
             </span>
@@ -25,13 +25,15 @@
         props: {
             column: Object,
             index: Number,
-            isSortable: Boolean
+            isSortable: Boolean,
+            order: Object
         },
 
         inject: ['rootTable'],
 
         data() {
             return {
+                newOrder: this.order || {},
                 handler: null,
                 width: 'auto',
                 resizeFunction: null,
@@ -50,6 +52,9 @@
         },
 
         watch: {
+            order() {
+                this.newOrder = this.order;
+            },
             column() {
                 this.init();
             },
@@ -65,8 +70,18 @@
                 this.handler = this.$el.querySelector('.resize-handler');
                 this.width = 'auto';
 
+                if(this.column && typeof this.column.getState === 'function') {
+                    this.width = this.column.getState('width');
+                }
+
                 this.$nextTick(() => {
-                    this.updateCellWidth(this.$el.getBoundingClientRect().width+'px');
+                    let width = this.width;
+
+                    if(width === 'auto') {
+                        width = this.$el.getBoundingClientRect().width+'px';
+                    }
+
+                    this.updateCellWidth(width);
                 });
             },
 
@@ -94,6 +109,8 @@
             updateCellWidth(width) {
                 this.width = width;
                 this.rootTable.updateCellWidth(this.index, width);
+
+                this.column.setState('width', this.width);
             }
 
         },
@@ -102,6 +119,17 @@
             cellStyle() {
                 return {
                     width: this.width
+                }
+            },
+
+            caretClass() {
+                if(! this.isSortable || this.newOrder.column !== this.column.key) {
+                    return '';
+                }
+
+                return {
+                    ascending: this.newOrder.direction === 'asc',
+                    descending: this.newOrder.direction === 'desc'
                 }
             }
         }

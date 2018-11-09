@@ -10,9 +10,13 @@
                  ref="queryForm">
 
             <el-form-item label="WHERE" prop="column">
-                <el-select v-model="query.column" placeholder="Select column">
+                <el-select v-model="query.column"
+                           placeholder="Select column"
+                           filterable
+                           default-first-option>
                     <el-option v-for="item in columns"
                                :key="item.name"
+
                                :label="item.name"
                                :value="item.name">
                     </el-option>
@@ -20,7 +24,10 @@
             </el-form-item>
 
             <el-form-item class="query-operator-form-item" prop="operator">
-                <el-select v-model="query.operator" placeholder="Select operator">
+                <el-select v-model="query.operator"
+                           placeholder="Select operator"
+                           filterable
+                           default-first-option>
                     <el-option v-for="item in operators"
                                :key="item"
                                :label="item"
@@ -47,11 +54,15 @@
             <data-table :columns="columns" sortable editable
                         :loading="loading"
                         :scroll-pos="scrollPos"
+                        ref="datatable"
+                        :order="order"
                         @scroll="handleScroll"
+                        @order="handelOrder"
                         :content="content">
             </data-table>
         </div>
 
+        <main-footer></main-footer>
     </div>
 
 </template>
@@ -61,14 +72,7 @@
     import GeneralComputedMixin from '../mixins/GeneralComputedMixin';
     import {QUERY_OPRATORS} from "../../utils/constants";
     import debounce from 'lodash/debounce';
-
-    const createQueryForm = () => {
-        return {
-            column: null,
-            operator: '=',
-            value: null
-        };
-    };
+    import MainFooter from "./MainFooter";
 
     export default {
 
@@ -77,9 +81,6 @@
         data() {
             return {
                 loading: false,
-                query: createQueryForm(),
-                order: {},
-                limit: 100,
                 loaded: false,
                 operators: QUERY_OPRATORS
             }
@@ -96,7 +97,6 @@
             },
             table: {
                 handler(table) {
-                    this.query = createQueryForm();
                     this.loaded = false;
                     this.fetchContent();
                 },
@@ -117,17 +117,35 @@
                 this.table.setState('scrollLeft', pos.left);
             }, 80),
 
-            fetchContent() {
+            handelOrder(order) {
+                this.order = order;
+
+                this.fetchContent(true)
+                    .then(table => {
+                        if(! this.$refs.datatable) {
+                            return;
+                        }
+
+                        this.$refs.datatable.updateList();
+                    });
+            },
+
+            fetchContent(refresh = false) {
                 if(! this.table) {
                     return;
                 }
 
-                this.loading = true;
                 this.loaded = true;
 
-                this.table.getContent(this.query, this.order, this.limit)
+                if(! refresh) {
+                    this.loading = true;
+                }
+
+                return this.table.getContent(refresh)
                     .then(table => {
                         this.loading = false;
+
+                        return table;
                     })
                     .catch(err => {
                         console.log('table', err);
@@ -151,8 +169,35 @@
                 }
             },
 
+            query: {
+                get() {
+                    return this.table ? this.table.getState('queryForm') : {};
+                },
+                set(value) {
+                    this.table.setState('queryForm', value);
+                }
+            },
+
+            order: {
+                get() {
+                    return this.table ? this.table.getState('order') : {};
+                },
+                set(value) {
+                    this.table.setState('order', value);
+                }
+            },
+
+            limit: {
+                get() {
+                    return this.table ? this.table.getState('limit') : {};
+                },
+                set(value) {
+                    this.table.setState('limit', value);
+                }
+            },
+
             columns() {
-                return this.table ? this.table.columns.all() : [];
+                return this.table ? this.table.tableColumns.all() : [];
             },
 
             content() {
@@ -162,7 +207,8 @@
         },
 
         components: {
-            DataTable
+            DataTable,
+            MainFooter
         }
 
     }

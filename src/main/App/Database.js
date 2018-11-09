@@ -1,7 +1,5 @@
 import TablesCollection from './TablesCollection';
-import RowsChunks from './Drivers/RowsChunks';
-import moment from 'moment';
-import ResultSetHeader from "./ResultSetHeader";
+import ColumnsCollection from "./ColumnsCollection";
 
 export default class Database {
 
@@ -47,8 +45,12 @@ export default class Database {
             .table(tableName)
             .take(limit);
 
-        if(query && query.value && query.column) {
+        if(query && query.column) {
             builder.where(query.column, query.operator, query.value);
+        }
+
+        if(order && order.column) {
+            builder.orderBy(order.column, order.direction)
         }
 
         return await builder.get();
@@ -58,7 +60,14 @@ export default class Database {
         const db = await this.connection.use(this.name);
         const results = await db.query(query);
 
-        return results.map((set) => set.toJSON());
+        return results.map((set) => {
+            if(set.columns) {
+                let columns = new ColumnsCollection(set.columns, {});
+                set.columns = columns.toRenderer();
+            }
+
+            return set.toJSON();
+        });
     }
 
     isSystemDatabase() {

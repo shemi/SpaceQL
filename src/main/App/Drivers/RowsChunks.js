@@ -7,6 +7,7 @@ class RowsChunks {
 
     constructor() {
         this.chunks = {};
+        this.chunkColumns = {};
     }
 
     create(rows) {

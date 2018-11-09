@@ -18,13 +18,10 @@
 </template>
 
 <script>
-    // reference https://github.com/noeldelgado/gemini-scrollbar/blob/master/index.js
-
     import {addResizeListener, removeResizeListener} from 'element-ui/src/utils/resize-event';
     import scrollbarWidth from 'element-ui/src/utils/scrollbar-width';
     import Bar from './bar';
 
-    /* istanbul ignore next */
     export default {
         name: 'ElScrollbar',
 

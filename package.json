@@ -3,7 +3,7 @@
   "productName": "SpaceQL",
   "version": "0.0.1-alpha.2",
   "author": "shemi perez <shemi.perez@gmail.com>",
-  "description": "An electron-vue project",
+  "description": "Fast open source database management application",
   "license": "(ISC OR GPL-3.0)",
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -18,10 +18,13 @@
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
+    "installer:win": "node src/installers/windows/createinstaller.js",
+    "vuild-installer:win": "cross-env BUILD_TARGET=win32 node .electron-vue/build.js && node src/installers/windows/createinstaller.js",
     "postinstall": ""
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "buffer-image-size": "^0.6.4",
     "codemirror": "^5.41.0",
     "cryptr": "^4.0.0",
     "element-ui": "^2.4.7",
@@ -70,6 +73,7 @@
     "electron-devtools-installer": "^2.2.4",
     "electron-packager": "^12.1.0",
     "electron-rebuild": "^1.8.1",
+    "electron-winstaller": "^2.7.0",
     "file-loader": "^1.1.11",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "0.4.0",

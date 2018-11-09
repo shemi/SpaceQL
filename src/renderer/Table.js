@@ -1,6 +1,8 @@
 import Collection from "../utils/Collection";
 import Service from "./Service";
 import Stateable from "./Stateable";
+import ColumnsCollection from "./ColumnsCollection";
+import RowCollection from "./RowCollection";
 
 export default class Table extends Stateable {
 
@@ -22,8 +24,22 @@ export default class Table extends Stateable {
         this.created_at = created_at;
         this.collation = collation;
         this.comment = comment;
-        this.columns = new Collection(columns, this);
-        this.content = new Collection([], this);
+
+        this.columns = new ColumnsCollection(columns, {
+            name: this.name,
+            database: this.database.name
+        });
+
+        this.tableColumns = new ColumnsCollection(columns, {
+            name: this.name,
+            database: this.database.name
+        });
+
+        this.content = new RowCollection([], {
+            columns: this.tableColumns,
+            table: this.name,
+            database: this.database.name
+        });
 
         this.lastQuery = null;
 
@@ -67,30 +83,51 @@ export default class Table extends Stateable {
 
     }
 
-    async getContent(query = {}, order = {}, limit = 100, refresh = false) {
-        let tokenizeParams = JSON.stringify([query, order, limit]);
+    async getContent(refresh = false) {
+        let query = this.getState('queryForm'),
+            order = this.getState('order'),
+            limit = this.getState('limit'),
+            tokenizeParams = JSON.stringify([query, order, limit]);
 
-        if(tokenizeParams === this.lastQuery && ! refresh) {
+        if(! refresh && tokenizeParams === this.lastQuery) {
             return this;
         }
 
         this.lastQuery = tokenizeParams;
-        this.columns.deleteAll();
+
+        if(! refresh) {
+            this.tableColumns.deleteAll();
+        }
+
         this.content.deleteAll();
         this.resetScroll();
 
-        let {rows, columns} = await Service.sendTo(
-            this.tabId,
-            'TableController@content',
-            this.database.name,
-            this.name,
-            query,
-            order,
-            limit
-        );
+        let results;
 
-        this.content.merge(rows);
-        this.columns.merge(columns);
+        try {
+            results = await Service.sendTo(
+                this.tabId,
+                'TableController@content',
+                this.database.name,
+                this.name,
+                query,
+                order,
+                limit
+            );
+
+            this.tab.log.info(results.head, this.database.name);
+
+        } catch (e) {
+            this.tab.log.error(e, this.database.name);
+
+            return this;
+        }
+
+        if(! refresh) {
+            this.tableColumns.merge(results.columns);
+        }
+
+        this.content.merge(results.rows);
 
         return this;
     }
@@ -115,12 +152,23 @@ export default class Table extends Stateable {
         }
     }
 
+    get tab() {
+        return this.database.tab;
+    }
+
     get tabId() {
         return this.database.tabId;
     }
 
     static createState() {
         return {
+            queryForm: {
+                column: null,
+                operator: '=',
+                value: null
+            },
+            order: {},
+            limit: 100,
             scrollTop: 0,
             scrollLeft: 0,
         }

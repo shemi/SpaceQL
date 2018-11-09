@@ -28,14 +28,14 @@
                                  :key="'' + set.index"
                                  :name="'' + set.index">
 
-                        <data-table :columns="set.columns"
+                        <data-table :columns="set.columns.all()"
                                     :chunks-id="set.chunksId"
                                     :total="set.total"
                                     ref="dataTables"
                                     @scroll="handleScroll($event, set)"
                                     @load-next="handelLoadMore(set)"
                                     :scroll-pos="getSetScrollPos(set)"
-                                    :content="set.rows">
+                                    :content="set.rows.all()">
                         </data-table>
 
                     </el-tab-pane>

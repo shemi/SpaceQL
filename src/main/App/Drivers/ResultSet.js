@@ -4,17 +4,18 @@ import uuid from 'uuid/v4';
 
 class ResultSet {
 
-    constructor(statement, start = null) {
+    constructor(statement, start = null, nested = false) {
         this.head = new ResultSetHead(start);
         this.rows = [];
         this.columns = null;
         this.statement = statement;
         this.chunkId = null;
         this.setId = uuid();
+        this.nested = nested;
     }
 
     setRows(rows, columns = []) {
-        let ri;
+        let ri, column;
 
         this.setColumns(columns);
 
@@ -48,6 +49,12 @@ class ResultSet {
 
             if(typeof column.inspect === 'function') {
                 column = column.inspect();
+            }
+
+            column.key = column.name;
+
+            if(this.nested) {
+                column.key = `${column.table}_${column.key}`;
             }
 
             column.__spqlInternalId = 's_'+ this.setId +'c_'+ index;

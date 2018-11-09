@@ -8,7 +8,23 @@ export default class Stateable {
         this.resetState();
     }
 
-    resetState() {
+    resetState(keys = null) {
+        if(keys) {
+            keys = typeof keys === 'string' ? [keys] : keys;
+
+            const defaults = this.constructor.createState();
+
+            for(let key of keys) {
+                if(typeof defaults[key] === "undefined") {
+                    continue;
+                }
+
+                this.setState(key, defaults[key]);
+            }
+
+            return;
+        }
+
         Vue.set(this, 'state', this.constructor.createState());
     }
 

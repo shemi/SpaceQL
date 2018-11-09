@@ -45,6 +45,8 @@ export default class QueryBuilder {
     }
 
     orderBy(column, direction = 'asc') {
+        direction = direction || 'asc';
+
         this.orders.push({
             column,
             direction: direction.toLowerCase() === 'asc' ? 'asc' : 'desc'

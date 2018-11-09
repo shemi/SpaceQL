@@ -1,8 +1,13 @@
 <template>
 
-    <div :style="style" class="data-table-cell">
+    <div :style="style" :class="classes" class="data-table-cell">
         <div class="cell-content">
-            {{ value || 'NULL' }}
+            <el-tag v-if="cell.displayTag" size="mini" type="info">
+                {{ cell.displayTag }}
+            </el-tag>
+            <span v-else>
+                {{ cell.displayValue }}
+            </span>
         </div>
     </div>
 
@@ -13,15 +18,14 @@
     export default {
 
         props: {
-            value: {
-                type: [String, Number, Boolean, Object],
-                default: null
+            cell: {
+                type: Object,
+                default: () => {return {}}
             },
             editable: {
                 type: Boolean,
                 default: false
             },
-            column: Object,
             rowIndex: Number,
             cellIndex: Number,
             cellStyle: Object
@@ -34,16 +38,17 @@
         },
 
         watch: {
-            column: {
-                handler() {
 
-                },
-                deep: true,
-                immediate: true
-            }
         },
 
         computed: {
+
+            classes() {
+                return {
+
+                }
+            },
+
             style() {
                 if(! this.cellStyle && ! this.cellStyle[this.cellIndex]) {
                     return {};
@@ -58,3 +63,26 @@
     }
 
 </script>
+
+<style lang="scss" scoped>
+
+    .data-table-cell {
+        display: flex;
+        width: 100%;
+        height: 100%;
+
+        .cell-content {
+            line-height: 1;
+        }
+
+        .el-tag--mini {
+            height: 12px;
+            padding: 0 4px;
+            border-radius: 0;
+            line-height: 12px;
+            font-size: 0.7em;
+        }
+
+    }
+
+</style>

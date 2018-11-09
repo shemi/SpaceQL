@@ -2,17 +2,14 @@
 
     <div class="data-table-row">
         <div class="row-selector">
-
         </div>
 
         <data-table-cell v-for="(column, index) in columns"
-                         :key="tableId + row.__spqlInternalRowId + column.name"
+                         :key="tableId + row.__spqlInternalRowId + column.key"
                          :row-index="rowIndex"
                          :cell-index="index"
-                         :column="column"
                          :cell-style="cellsStyle"
-                         :value="row[column.name]">
-
+                         :cell="row.cells[index]">
         </data-table-cell>
 
     </div>
@@ -26,7 +23,6 @@
     export default {
         mixins: [
             IdState({
-                // You can customize this
                 idProp: vm => vm.row.__spqlInternalRowId,
             }),
         ],

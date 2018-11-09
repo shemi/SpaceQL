@@ -13,6 +13,8 @@
                 :key="index+column.name"
                 :column="column"
                 :index="index"
+                :order="newOrder"
+                @click.native="handelOrder(column)"
                 :is-sortable="isSortable"
             >
             </data-table-header-cell>
@@ -38,11 +40,9 @@
 
         data() {
             return {
+                newOrder: this.order || {},
                 currentResizeableCell: null,
-                observer: null,
-                cellsStyle: {
-
-                }
+                observer: null
             }
         },
 
@@ -62,7 +62,19 @@
             });
         },
 
+        beforeDestroy() {
+            if(this.observer) {
+                this.observer.disconnect();
+            }
+        },
+
         watch: {
+            order: {
+                handler(order) {
+                    this.newOrder = order;
+                },
+                deep: true
+            },
             columns: {
                 handler(newColumns, oldColumns) {
 
@@ -73,6 +85,26 @@
         },
 
         methods: {
+
+            handelOrder(column) {
+                if(! this.isSortable) {
+                    return;
+                }
+
+                if(column.name !== this.newOrder.column) {
+                    this.$set(this.newOrder, 'direction', null);
+                }
+
+                this.$set(this.newOrder, 'column', column.key);
+
+                if(this.newOrder.direction === 'desc') {
+                    this.$set(this.newOrder, 'direction', null);
+                } else {
+                    this.$set(this.newOrder, 'direction', this.newOrder.direction === 'asc' ? 'desc' : 'asc');
+                }
+
+                this.$emit('on-order', this.newOrder);
+            },
 
             updateCellWidth(columnIndex, width) {
                 const cellElement = this.$refs['cells'][columnIndex];
@@ -105,6 +137,8 @@
     $--color-data-table-border: rgba(black, 0.3);
 
     .snr-data-table .data-table-header {
+        cursor: default;
+        user-select: none;
 
         .data-table-header-row {
             background-color: $--table-header-background;
@@ -170,6 +204,14 @@
             .sort-caret.descending {
                 border-top-color: #c0c4cc;
                 bottom: 7px;
+            }
+
+            .ascending .sort-caret.ascending {
+                border-bottom-color: $--color-primary;
+            }
+
+            .descending .sort-caret.descending {
+                border-top-color: $--color-primary;
             }
         }
 

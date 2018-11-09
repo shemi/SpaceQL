@@ -10,6 +10,7 @@
                 <data-table-header :columns="columns"
                                    :is-sortable="sortable"
                                    @update-style="updateWidth"
+                                   @on-order="handelOrder"
                                    :order="order">
                 </data-table-header>
 
@@ -24,8 +25,7 @@
                                 ref="heightElement"
                                 @scroll.native="handleScroll"
                                 keyField="__spqlInternalRowId"
-                                :buffer="rowsBench"
-                        >
+                                :buffer="rowsBench">
 
                             <data-table-row
                                 slot-scope="{item}"
@@ -56,16 +56,14 @@
     import Scrollbar from './Scrollbar/main';
     import RecycleScroller from "vue-virtual-scroller/src/components/RecycleScroller";
 
+    const SCROLL_BOTTOM_OFFSET = 200;
+
     export default {
 
         props: {
             columns: Array,
             content: Array,
-            chunksId: {
-                type: String,
-                required: false,
-                default: null
-            },
+            order: Object,
             sortable: {
                 type: Boolean,
                 default: false
@@ -93,11 +91,10 @@
         data() {
             return {
                 randomId: uuid(),
-                order: {},
                 cellsStyle: {},
                 rows: this.content,
                 scrollReady: false,
-                rowSize: 23,
+                rowSize: 24,
                 remainRows: 0,
                 contentStyle: {width: '100%'},
                 wrapStyle: {
@@ -109,9 +106,6 @@
         },
 
         watch: {
-            content() {
-
-            },
 
             columns() {
                 this.resetCellsStyles();
@@ -129,6 +123,10 @@
             }, 150),
 
             handleScroll(e) {
+                let scrollTop,
+                    scrollPos,
+                    scrollHeight;
+
                 if(this.$refs.scrollbar) {
                     this.$refs.scrollbar.handleScroll(e);
                 }
@@ -137,10 +135,23 @@
                     return;
                 }
 
+                scrollTop = this.heightElement.scrollTop;
+                scrollPos = scrollTop + this.heightElement.offsetHeight;
+                scrollHeight = this.heightElement.scrollHeight;
+
+                if((scrollHeight - scrollPos) < SCROLL_BOTTOM_OFFSET) {
+                    this.$emit('load-next');
+                }
+
                 this.$emit('scroll', {
                     top: this.heightElement.scrollTop,
                     left: this.widthElement.scrollLeft,
                 });
+            },
+
+            handelOrder(order) {
+                console.log('datatable order', order);
+                this.$emit('order', order);
             },
 
             updateList() {
@@ -154,11 +165,15 @@
                             this.heightComponent.updateVisibleItems(false);
                         }
 
-                        this.heightComponent.scrollToPosition(this.scrollPos.top || 0);
+                        this.$nextTick(() => {
+                            this.heightComponent.scrollToPosition(this.scrollPos.top || 0);
+                        });
                     }
 
                     if(this.widthElement) {
-                        this.widthElement.scrollLeft = this.scrollPos.left || 0;
+                        this.$nextTick(() => {
+                            this.widthElement.scrollLeft = this.scrollPos.left || 0;
+                        });
                     }
 
                     if(this.$refs.scrollbar) {

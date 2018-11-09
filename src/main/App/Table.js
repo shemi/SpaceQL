@@ -1,11 +1,10 @@
-import ColumnsCollection from "./ColumnsCollection";
-import Collection from "../../utils/Collection";
+import ColumnsInfoCollection from "./ColumnsInfoCollection";
 import app from './App';
+import ColumnsCollection from "./ColumnsCollection";
 
 export default class Table {
 
     constructor(data, database) {
-
         let { name, type,
             engine, format,
             rows, created_at,
@@ -20,9 +19,8 @@ export default class Table {
         this.created_at = created_at;
         this.collation = collation;
         this.comment = comment;
-        this.columns = new ColumnsCollection([], this);
+        this.columns = new ColumnsInfoCollection([], this);
         this.columnsLoaded = false;
-        this.content = new Collection;
 
         this.database = database;
 
@@ -36,7 +34,10 @@ export default class Table {
         }
 
         this.columns.deleteAll();
-        this.columns.collect(await this.database.getColumns(this.name));
+
+        this.columns.collect(
+            await this.database.getColumns(this.name)
+        );
 
         return this.columns;
     }
@@ -47,16 +48,13 @@ export default class Table {
     }
 
     async getContent(query = null, order = null, limit = 200) {
-        this.content.deleteAll();
+        const columns = new ColumnsCollection([], this);
 
-        let {rows: data} = await this.database.queryTable(this.name, query, order, limit);
+        let results = await this.database.queryTable(this.name, query, order, limit);
 
-        this.content.collect(data);
+        results.columns = columns.collect(results.columns).all();
 
-        return {
-            rows: this.content.toRenderer(),
-            columns: this.columns.toRenderer()
-        }
+        return results.toJSON();
     }
 
     toRenderer() {

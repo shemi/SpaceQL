@@ -1,45 +1,79 @@
+import * as TYPES from 'mysql2/lib/constants/types';
+import * as CHARSETS from 'mysql2/lib/constants/charsets';
+import * as FLAGS from 'mysql2/lib/constants/field_flags';
 
 export default class Column {
 
-    constructor(data, table) {
+    constructor(data) {
         let {
-            name, position,
-            default_value, is_nullable,
-            data_type, character_maximum_length,
-            character_set, collation,
-            column_key, privileges,
-            comment
+            name, key, characterSet,
+            columnLength, columnType,
+            decimals, flags, schema,
+            table, __spqlInternalId
         } = data;
 
+        this.key = key;
         this.name = name;
-        this.position = position;
-        this.default_value = default_value;
-        this.is_nullable = is_nullable;
-        this.data_type = data_type;
-        this.character_maximum_length = character_maximum_length;
-        this.character_set = character_set;
-        this.collation = collation;
-        this.column_key = column_key;
-        this.privileges = privileges;
-        this.comment = comment;
+        this.character_set = characterSet;
+        this.type = Column.getTypeName(columnType);
+        this.data_type = columnType;
+        this.length = columnLength;
+        this.decimals = decimals;
+        this.flags = flags;
+        this.database = schema;
         this.table = table;
+        this.__spqlInternalId = __spqlInternalId;
+
+        this.is_nullable = true;
+        this.is_primary = false;
+        this.is_unique = false;
+        this.is_indexed = false;
+        this.is_blob = false;
+        this.is_unsigned = false;
+        this.is_binary = false;
+        this.is_auto_increment = false;
+
+        if(this.flags) {
+            this.is_nullable = ! (this.flags & FLAGS.NOT_NULL);
+            this.is_primary = !! (this.flags & FLAGS.PRI_KEY);
+            this.is_unique = !! (this.flags & FLAGS.UNIQUE_KEY);
+            this.is_indexed = !! (this.flags & FLAGS.MULTIPLE_KEY);
+            this.is_blob = !! (this.flags & FLAGS.BLOB);
+            this.is_unsigned = !! (this.flags & FLAGS.UNSIGNED);
+            this.is_binary = !! (this.flags & FLAGS.BINARY);
+            this.is_auto_increment = !! (this.flags & FLAGS.AUTO_INCREMENT);
+
+        }
     }
 
     toRenderer() {
         return {
+            key: this.key,
             name: this.name,
-            position: this.position,
-            default_value: this.default_value,
-            is_nullable: this.is_nullable,
-            data_type: this.data_type,
-            character_maximum_length: this.character_maximum_length,
             character_set: this.character_set,
-            collation: this.collation,
-            column_key: this.column_key,
-            extra: this.extra,
-            privileges: this.privileges,
-            comment: this.comment
+            type: this.type,
+            data_type: this.data_type,
+            length: this.length,
+            decimals: this.decimals,
+            flags: this.flags,
+            database: this.database,
+            table: this.table,
+            __spqlInternalId: this.__spqlInternalId,
+            is_nullable: this.is_nullable,
+            is_primary: this.is_primary,
+            is_unique: this.is_unique,
+            is_indexed: this.is_indexed,
+            is_blob: this.is_blob,
+            is_unsigned: this.is_unsigned,
+            is_binary: this.is_binary,
+            is_auto_increment: this.is_auto_increment
         }
+    }
+
+    static getTypeName(type) {
+        let newType = Object.keys(TYPES).find(key => TYPES[key] === type);
+
+        return newType ? newType.toLowerCase() : '';
     }
 
 }

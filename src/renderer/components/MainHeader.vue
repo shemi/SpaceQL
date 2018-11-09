@@ -6,6 +6,7 @@
             <div class="database-select">
                 <el-select v-model="database"
                            filterable
+                           default-first-option
                            size="small"
                            @change="handelDatabaseChange"
                            :disabled="! isActive"
