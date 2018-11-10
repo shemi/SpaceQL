@@ -3195,6 +3195,10 @@ function-bind@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
 
+fuse.js@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/fuse.js/-/fuse.js-3.3.0.tgz#1e4fe172a60687230fb54a5cb247eb96e2e7e885"
+
 galactus@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/galactus/-/galactus-0.2.1.tgz#cbed2d20a40c1f5679a35908e2b9415733e78db9"
@@ -3433,6 +3437,10 @@ header-case@^1.0.0:
   dependencies:
     no-case "^2.2.0"
     upper-case "^1.1.3"
+
+highlight.js@^9.13.1:
+  version "9.13.1"
+  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-9.13.1.tgz#054586d53a6863311168488a0f58d6c505ce641e"
 
 highlight.js@^9.3.0:
   version "9.12.0"

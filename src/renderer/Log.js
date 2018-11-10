@@ -3,18 +3,31 @@ import SqlError from "../utils/Exceptions/SqlError";
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
 import trim from 'lodash/trim';
+import uuid from 'uuid/v4';
+import Stateable from "./Stateable";
+import Service from "./Service";
+import Vue from "vue";
 
 const moment = extendMoment(Moment);
 
-class LogMessage {
+class LogMessage extends Stateable {
 
     constructor(message = null, database = null) {
+        super();
+
         this.createdAt = moment();
-        this.read = false;
         this.originalMessage = message;
         this.database = database;
+        this.displayStartTime = null;
+        this.displayEndTime = null;
         this.message = '';
         this.type = LOG_TYPE_INFO;
+        this.sqlString = '';
+        this.tables = [];
+        this.databases = [];
+        this.table = '';
+
+        this.id = uuid();
 
         if(typeof message === 'string') {
             this.message = message;
@@ -25,8 +38,57 @@ class LogMessage {
         }
     }
 
+    displayTime(time) {
+        let format = 'HH:mm:ss';
+
+        if(! time.isSame(moment(), "day")) {
+            format = 'ddd, MMM Do YYYY, ' + format;
+        }
+
+        return time.format(format);
+    }
+
+    displayCreatedAt() {
+        return this.displayTime(this.createdAt);
+    }
+
+    displayTimeRange() {
+        let timeString = '';
+
+        timeString += this.displayStartTime || 'N/A';
+        timeString += ' > ';
+        timeString += this.displayEndTime || 'N/A';
+
+        return timeString;
+    }
+
+    displayLocation() {
+        let location = this.database || '';
+
+        if(this.table) {
+            location += `.${this.table}`;
+        }
+
+        return location.replace(/[\`\'\"]+/g, '');
+    }
+
     markRead() {
-        this.read = true;
+        this.setState('read', true);
+    }
+
+    get read() {
+        return this.getState('read');
+    }
+
+    get isOpen() {
+        return this.getState('open');
+    }
+
+    static createState() {
+        return {
+            read: false,
+            open: false
+        };
     }
 
 }
@@ -36,17 +98,17 @@ class ErrorLog extends LogMessage {
         super(message, database);
 
         this.type = LOG_TYPE_ERROR;
-        this.sqlMessage = '';
         this.code = '';
         this.sqlState = null;
         this.errno = null;
-        this.sqlState = null;
+        this.sqlString = '';
 
         if(message instanceof SqlError) {
-            this.sqlMessage = message.sqlMessage;
+            this.message = message.sqlMessage;
             this.code = message.code;
             this.errno = message.errno;
             this.sqlState = message.sqlState;
+            this.sqlString = message.sqlString || '';
         }
 
     }
@@ -71,10 +133,11 @@ class InfoLog extends LogMessage {
         if(typeof message === 'object') {
             if(message.time && message.time.start) {
                 this.startTime = moment(message.time.start);
+                this.displayStartTime = this.displayTime(this.startTime);
             }
-
             if(message.time && message.time.end) {
                 this.endTime = moment(message.time.end);
+                this.displayEndTime = this.displayTime(this.endTime);
             }
 
             if(this.startTime && this.endTime) {
@@ -139,11 +202,11 @@ class InfoLog extends LogMessage {
                 break;
 
             default:
-                if(this.rowsCount >= 0) {
+                if(this.rowsCount != null) {
                     message += `${this.rowsCount} row(s) returned; `;
                 }
 
-                if(this.affectedRows >= 0) {
+                if(this.affectedRows != null) {
                     message += `${this.affectedRows} row(s) affected; `;
                 }
 
@@ -151,7 +214,7 @@ class InfoLog extends LogMessage {
                     message += `Insert ID: ${this.insertId}; `;
                 }
 
-                if(this.changedRows >= 0) {
+                if(this.changedRows != null) {
                     message += `${this.changedRows} row(s) changed; `;
                 }
 
@@ -175,11 +238,12 @@ class WarningLog extends LogMessage {
     }
 }
 
-class Log {
+class Log extends Stateable {
 
     constructor() {
-        this.logs = [];
+        super();
 
+        this.logs = [];
     }
 
     info(message, databaseName = null) {
@@ -194,6 +258,33 @@ class Log {
 
     warning(message, databaseName = null) {
         this.logs.push(new WarningLog(message, databaseName));
+    }
+
+    clear(database) {
+        let items = [];
+
+        if(this.getState('filterDatabase')) {
+            items = this.logs.filter(item => item.database !== database);
+        }
+
+        Vue.set(this, 'logs', items);
+    }
+
+    getStateSettings() {
+        return {
+            storeKey: this.constructor.name.toLowerCase(),
+            keysToStore: ['showSettings', 'filterDatabase', 'levels']
+        }
+    }
+
+    static createState() {
+        return {
+            showSettings: Service.getPreference('log.showSettings', false),
+            filterDatabase: Service.getPreference('log.filterDatabase', true),
+            levels: Service.getPreference('log.levels', [LOG_TYPE_INFO, LOG_TYPE_ERROR]),
+            search: '',
+            tables: ['all']
+        };
     }
 
 }

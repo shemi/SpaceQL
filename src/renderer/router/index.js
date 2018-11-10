@@ -52,6 +52,12 @@ const router = new Router({
             },
             children: [
                 {
+                    path: 'log',
+                    components: {
+                        default: require('@/components/Log').default,
+                    }
+                },
+                {
                     path: 'query',
                     components: {
                         default: require('@/components/Query').default,

@@ -16,11 +16,15 @@ export default class Connection {
         this.form = originalForm;
         this.name = name;
         this.databases = new DatabasesCollection(databases || [], this);
-        this.selectedDatabase = this.getFirstDatabaseToSelect();
         this.privileges = privileges || [];
+        this.selectedDatabase = null;
+
+        Vue.set(this, 'selectedDatabase', this.getFirstDatabaseToSelect());
+
         this.log = [];
         this.version = version.version;
         this.fullVersion = version.fullVersion;
+
     }
 
     getFirstDatabaseToSelect() {
@@ -46,7 +50,7 @@ export default class Connection {
             this.selectedDatabase.deactivated();
         }
 
-        this.selectedDatabase = database;
+        Vue.set(this, 'selectedDatabase', database);
 
         return await this.selectedDatabase.loadTables();
     }

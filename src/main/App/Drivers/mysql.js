@@ -2,9 +2,9 @@ import Driver from './Driver';
 import mysql from 'mysql2/promise';
 import QueryBuilder from "./QueryBuilder";
 import MySqlGrammar from "./Grammars/MySqlGrammar";
-import { Crud } from 'mysql-crud-parser';
 import ResultSet from "./ResultSet";
 import moment from "moment";
+import {SQLParser} from "./Parser";
 
 class MysqlDriver extends Driver {
 
@@ -117,16 +117,25 @@ class MysqlDriver extends Driver {
             single = true;
         }
 
-        let crud = new Crud(sql),
+        let statements = SQLParser.parse(sql, 'mysql', ';'),
             connection = await this.getConnection(),
             sets = [],
             statement,
+            rowsSets,
+            columnsSets,
+            index = 0;
+
+        try {
             [rowsSets, columnsSets] = await connection.query({
                 sql,
                 values,
                 nestTables: single ? false : '_'
-            }),
-            index = 0;
+            });
+        } catch (e) {
+            e.sqlString = sql;
+
+            throw e;
+        }
 
         if(rowsSets && ! Array.isArray(rowsSets[0])) {
             rowsSets = [rowsSets];
@@ -144,7 +153,7 @@ class MysqlDriver extends Driver {
             columnsSets = [];
         }
 
-        for(statement of crud.statements) {
+        for(statement of statements) {
             let rows = rowsSets[index];
             let columns = columnsSets[index];
             let resultSet = new ResultSet(statement, start, ! single);

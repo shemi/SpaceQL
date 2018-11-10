@@ -37,9 +37,9 @@ class ResultSetHead {
         }
 
         if(statement) {
-            this.statementType = statement.type ? statement.type.toLowerCase() : '';
-            this.table = statement.table || '';
-            this.sqlString = statement.toString();
+            this.sqlString = statement.sql;
+            this.table = statement.table;
+            this.statementType = statement.type;
         }
 
         return this;

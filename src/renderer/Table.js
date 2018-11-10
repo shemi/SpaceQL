@@ -42,6 +42,8 @@ export default class Table extends Stateable {
         });
 
         this.lastQuery = null;
+        this.contentChanged = false;
+        this.structureChanged = false;
 
         Service.on(this.tabId, `UpdateTable@${this.name}`, this.update.bind(this));
     }
@@ -89,6 +91,8 @@ export default class Table extends Stateable {
             limit = this.getState('limit'),
             tokenizeParams = JSON.stringify([query, order, limit]);
 
+        refresh = refresh || this.contentChanged;
+
         if(! refresh && tokenizeParams === this.lastQuery) {
             return this;
         }
@@ -128,6 +132,7 @@ export default class Table extends Stateable {
         }
 
         this.content.merge(results.rows);
+        this.contentChanged = false;
 
         return this;
     }

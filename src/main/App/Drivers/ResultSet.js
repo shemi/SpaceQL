@@ -66,10 +66,7 @@ class ResultSet {
     }
 
     closeHead(data) {
-        this.head.close({
-            ...data,
-            sqlString: this.statement.toString()
-        }, this.statement);
+        this.head.close(data, this.statement);
 
         return this;
     }
@@ -79,8 +76,12 @@ class ResultSet {
             head: this.head.toJson(),
             rows: this.rows,
             columns: this.columns,
-            type: this.statement.type ? this.statement.type.toLowerCase() : '',
-            table: this.statement.table,
+            type: this.statement.type,
+            types: this.statement.types,
+            table: this.statement.table || '',
+            database: this.statement.database || '',
+            databasesTables: this.statement.tdSets,
+            contentChanged: this.statement.contentChanged || false,
             chunkId: this.chunkId
         }
     }

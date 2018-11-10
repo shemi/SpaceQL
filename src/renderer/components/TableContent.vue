@@ -62,7 +62,11 @@
             </data-table>
         </div>
 
-        <main-footer></main-footer>
+        <main-footer>
+            <div class="footer-action is-icon" @click="fetchContent(true)">
+                <i class="el-icon-refresh"></i>
+            </div>
+        </main-footer>
     </div>
 
 </template>
@@ -120,14 +124,7 @@
             handelOrder(order) {
                 this.order = order;
 
-                this.fetchContent(true)
-                    .then(table => {
-                        if(! this.$refs.datatable) {
-                            return;
-                        }
-
-                        this.$refs.datatable.updateList();
-                    });
+                this.fetchContent(true);
             },
 
             fetchContent(refresh = false) {
@@ -144,6 +141,10 @@
                 return this.table.getContent(refresh)
                     .then(table => {
                         this.loading = false;
+
+                        if(refresh && this.$refs.datatable) {
+                            this.$refs.datatable.updateList();
+                        }
 
                         return table;
                     })

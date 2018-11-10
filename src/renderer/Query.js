@@ -106,6 +106,15 @@ export default class Query extends Stateable {
             for(set of results) {
                 this.tab.log.info(set.head, this.database.name);
 
+                console.log(set, 'table ' + set.table + ' changed');
+                if(set.contentChanged && set.table) {
+                    let table = this.database.tables.find({name: set.table});
+
+                    if(table) {
+                        table.contentChanged = true;
+                    }
+                }
+
                 if(set.columns && set.columns.length > 0) {
                     this.resultsSets.push(new QueryResultSet(
                         this.tabId,

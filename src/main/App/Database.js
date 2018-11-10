@@ -45,7 +45,7 @@ export default class Database {
             .table(tableName)
             .take(limit);
 
-        if(query && query.column) {
+        if(query && query.column && query.value) {
             builder.where(query.column, query.operator, query.value);
         }
 
