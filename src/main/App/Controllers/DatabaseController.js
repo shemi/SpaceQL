@@ -5,13 +5,14 @@ class DatabaseController extends Controller {
     get actions() {
         return [
             'tables',
-            'query'
+            'query',
+            'createTable'
         ];
     }
 
-    async tables(databaseName) {
+    async tables(databaseName, refresh = false) {
         const database = this.connection.databases.find({name: databaseName});
-        const tables = await database.getTables();
+        const tables = await database.getTables(refresh);
 
         return this.response(tables.toRenderer());
     }
@@ -28,6 +29,18 @@ class DatabaseController extends Controller {
                     reject(err);
                 });
         });
+    }
+
+    async createTable(databaseName, form) {
+        const database = this.connection.databases.find({name: databaseName});
+
+        if(! database) {
+            throw new Error("The database " + databaseName + " not found.");
+        }
+
+        const res = await database.createTable(form);
+
+        return this.response(res);
     }
 
 }

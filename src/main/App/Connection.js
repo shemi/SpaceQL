@@ -31,6 +31,8 @@ export default class Connection {
         this.databases = new DatabasesCollection;
         this.systemDatabases = new DatabasesCollection;
         this.version = null;
+        this.collations = [];
+        this.characterSets = [];
     }
 
     async test() {
@@ -52,7 +54,9 @@ export default class Connection {
     async initData() {
         const {
             databases,
-            version
+            version,
+            character_sets,
+            collations
         } = await this.driver.getInitData();
 
         if(databases && databases.length > 0) {
@@ -60,8 +64,18 @@ export default class Connection {
         }
 
         this.version = version;
+        this.characterSets = character_sets;
+        this.collations = collations;
 
         return this;
+    }
+
+    async createDatabase(form) {
+        let rawDatabase = await this.driver.createDatabase(form);
+
+        this.databases.push(rawDatabase);
+
+        return this.toRenderer();
     }
 
     async use(database) {
@@ -112,7 +126,9 @@ export default class Connection {
             name: this._dbConfig.user+'@'+this._dbConfig.host+':'+this._dbConfig.port,
             version: this.version,
             databases: this.databases.toRenderer(),
-            systemDatabases: this.systemDatabases.toRenderer()
+            systemDatabases: this.systemDatabases.toRenderer(),
+            collations: this.collations,
+            characterSets: this.characterSets
         }
     }
 

@@ -81,6 +81,7 @@
         border-top: 1px solid $--color-border-main-header;
         flex-grow: 0;
         flex-shrink: 0;
+        height: 32px;
 
         .sp-main-footer-controls {
             display: flex;

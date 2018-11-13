@@ -1,70 +1,59 @@
-import {BUILDER_OPRATORS} from "../../../utils/constants";
+import knex from 'knex';
 
 export default class QueryBuilder {
 
-    static operators = BUILDER_OPRATORS;
-
     constructor(driver) {
         this.driver = driver;
-        this.databse = '';
+        this.knex = knex({
+            client: this.driver.constructor.CLIENT,
+            version: `${driver.MAJOR}.${driver.MINOR}`,
+        });
 
-        this.from = '';
-        this.columns = ['*'];
-        this.wheres = [];
-        this.orders = [];
-        this.limit = null;
+        return new Proxy(this, {
+            get(target, propKey, receiver) {
+                if(target[propKey] !== undefined) {
+                    if(typeof target[propKey] === "function") {
+                        return function(...args) {
+                            return target[propKey].apply(this, args);
+                        }
+                    }
 
+                    return target[propKey];
+                }
+
+                const knexProp = target.knex[propKey];
+
+                if(knexProp === undefined) {
+                    throw new Error("the prop/method " + propKey + " not found on QueryBuilder");
+                }
+
+                if(typeof knexProp !== 'function') {
+                    return knexProp;
+                }
+
+                return function(...args) {
+                    target.knex = knexProp.apply(target.knex, args);
+
+                    return this;
+                }
+            }
+        });
     }
 
     use(database) {
-        this.databse = database;
+        this.knex.withSchema(database);
 
         return this;
     }
 
-    table(name) {
-        this.from = name;
-
-        return this;
-    }
-
-    select(names = ['*']) {
-        this.columns = Array.isArray(names) ? names : [names];
-
-        return this;
-    }
-
-    where(column, operator, value, bool = 'and') {
-        this.wheres.push({column, operator, value, bool});
-
-        return this;
-    }
-
-    orWhere(column, operator, value) {
-        return this.where(column, operator, value, 'or');
-    }
-
-    orderBy(column, direction = 'asc') {
-        direction = direction || 'asc';
-
-        this.orders.push({
-            column,
-            direction: direction.toLowerCase() === 'asc' ? 'asc' : 'desc'
-        });
-
-        return this;
-    }
-
-    take(limit) {
-        if(limit) {
-            this.limit = limit;
-        }
+    take(number) {
+        this.knex.limit(number);
 
         return this;
     }
 
     async first() {
-        return await this.limit(1).get();
+        return await this.take(1).get();
     }
 
     async get() {

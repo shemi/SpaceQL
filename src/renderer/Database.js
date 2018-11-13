@@ -24,6 +24,14 @@ export default class Database {
         this.selectFirstTable();
     }
 
+    refreshData(data) {
+        let {default_character_set,
+            default_collation} = data;
+
+        this.default_character_set = default_character_set;
+        this.default_collation = default_collation;
+    }
+
     selectFirstTable() {
         if(! this.tablesLoaded) {
             return;
@@ -32,9 +40,13 @@ export default class Database {
         this.selectTable(this.tables.first());
     }
 
+    getTable(name) {
+        return this.tables.first({name});
+    }
+
     selectTable(table) {
         if(typeof table === 'string') {
-            table = this.tables.first({name: table});
+            table = this.getTable(table);
         }
 
         if(this.selectedTable) {
@@ -44,7 +56,19 @@ export default class Database {
         Vue.set(this, 'selectedTable', table);
     }
 
+    selectTableOrFirst(table) {
+        if(table && this.getTable(table)) {
+            this.selectTable(table);
+
+            return;
+        }
+
+        this.selectFirstTable();
+    }
+
     async loadTables(refresh = false) {
+        const oldSelectedTable = this.selectedTable ? this.selectedTable.name : null;
+
         if(this.tablesLoaded && ! refresh) {
             return this;
         }
@@ -53,16 +77,41 @@ export default class Database {
 
         if(refresh) {
             this.tablesLoaded = false;
+            this.selectedTable = null;
             this.tables.deleteAll();
         }
 
-        const tables = await Service.sendTo(this.tabId, 'DatabaseController@tables', this.name);
+        const tables = await Service.sendTo(this.tabId, 'DatabaseController@tables', this.name, refresh);
 
         this.tables.collect(tables);
         this.tablesLoaded = true;
         this.loadingTables = false;
 
-        this.selectFirstTable();
+        if(refresh) {
+            this.selectTableOrFirst(oldSelectedTable);
+        } else {
+            this.selectFirstTable();
+        }
+
+        return this;
+    }
+
+    async createTable(form) {
+        try {
+            const res = await Service.sendTo(this.tabId, 'DatabaseController@createTable', this.name, form);
+
+            this.tab.log.info(res.head);
+
+        } catch (e) {
+            this.tab.log.error(e);
+
+            throw e;
+        }
+
+        this.loadTables(true)
+            .catch(err => {
+
+            });
 
         return this;
     }

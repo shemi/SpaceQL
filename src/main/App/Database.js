@@ -42,8 +42,9 @@ export default class Database {
         const db = await this.connection.use(this.name);
 
         const builder = db.builder()
-            .table(tableName)
-            .take(limit);
+            .select('*')
+            .use(this.name)
+            .from(tableName);
 
         if(query && query.column && query.value) {
             builder.where(query.column, query.operator, query.value);
@@ -52,6 +53,8 @@ export default class Database {
         if(order && order.column) {
             builder.orderBy(order.column, order.direction)
         }
+
+        builder.limit(limit);
 
         return await builder.get();
     }
@@ -68,6 +71,16 @@ export default class Database {
 
             return set.toJSON();
         });
+    }
+
+    async createTable(form) {
+        const db = await this.connection.use(this.name);
+
+        if(! form.name) {
+            throw new Error("Table name is missing.");
+        }
+
+        return await db.query(`CREATE TABLE ${form.name}`);
     }
 
     isSystemDatabase() {

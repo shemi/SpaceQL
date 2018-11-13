@@ -2,6 +2,7 @@ import DatabasesCollection from "./DatabasesCollection";
 import Service from "./Service";
 import Vue from "vue";
 
+
 export default class Connection {
 
     constructor(rawConnection, originalForm = {}, tab) {
@@ -9,7 +10,8 @@ export default class Connection {
         let {
             name,
             databases, privileges,
-            version
+            version, collations,
+            characterSets
         } = rawConnection;
 
         this.tab = tab;
@@ -17,6 +19,8 @@ export default class Connection {
         this.name = name;
         this.databases = new DatabasesCollection(databases || [], this);
         this.privileges = privileges || [];
+        this.collations = collations || [];
+        this.characterSets = characterSets || [];
         this.selectedDatabase = null;
 
         Vue.set(this, 'selectedDatabase', this.getFirstDatabaseToSelect());
@@ -25,6 +29,30 @@ export default class Connection {
         this.version = version.version;
         this.fullVersion = version.fullVersion;
 
+    }
+
+    setData(rawConnection) {
+        let {
+            databases, privileges,
+            collations, characterSets
+        } = rawConnection;
+
+        this.name = name;
+        this.privileges = privileges || [];
+        this.collations = collations || [];
+        this.characterSets = characterSets || [];
+
+        if(databases && Array.isArray(databases)) {
+            for(let database of databases) {
+                let exists = this.databases.first({name: database.name});
+
+                if(! exists) {
+                    this.databases.push(database);
+                } else {
+                    exists.refreshData(database);
+                }
+            }
+        }
     }
 
     getFirstDatabaseToSelect() {
@@ -53,6 +81,15 @@ export default class Connection {
         Vue.set(this, 'selectedDatabase', database);
 
         return await this.selectedDatabase.loadTables();
+    }
+
+    async createDatabase(form) {
+        return Service.sendTo(this.tabId, 'ConnectionController@createDatabase', form)
+            .then(rawConnection => {
+                this.setData(rawConnection);
+
+                return this.select(form.name);
+            });
     }
 
     setTab(tab) {

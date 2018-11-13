@@ -6,7 +6,11 @@ import ResultSet from "./ResultSet";
 import moment from "moment";
 import {SQLParser} from "./Parser";
 
+//https://knexjs.org/
+
 class MysqlDriver extends Driver {
+
+    static CLIENT = 'mysql2';
 
     connect() {
         return new Promise((resolve, reject) => {
@@ -27,8 +31,33 @@ class MysqlDriver extends Driver {
         return {
             version: await this.getVersion(),
             databases: await this.getDatabases(),
+            character_sets: await this.getCharacterSets(),
+            collations: await this.getCollations(),
             // privileges: await this.query('show privileges'),
         };
+    }
+
+    async getCharacterSets() {
+        let {rows: characterSets} = await this.query(
+            `SELECT 
+                CHARACTER_SET_NAME as \`name\`, 
+                DEFAULT_COLLATE_NAME as \`default_collate\` 
+            FROM INFORMATION_SCHEMA.CHARACTER_SETS`,
+            [], true);
+
+        return characterSets;
+    }
+
+    async getCollations() {
+        let {rows: characterSets} = await this.query(
+            `SELECT 
+                ID as \`id\`,
+                COLLATION_NAME as \`name\`,
+                CHARACTER_SET_NAME as \`character_set\`
+            FROM INFORMATION_SCHEMA.COLLATIONS`,
+            [], true);
+
+        return characterSets;
     }
 
     async getDatabases() {
@@ -44,8 +73,8 @@ class MysqlDriver extends Driver {
     }
 
     async getTables(database) {
-        let {rows: tables} = await this.query(`
-            select 
+        let {rows: tables} = await this.query(
+            `select 
                 TABLE_NAME as \`name\`,
                 TABLE_TYPE as \`type\`,
                 ENGINE as \`engine\`, 
@@ -55,8 +84,8 @@ class MysqlDriver extends Driver {
                 TABLE_COMMENT as \`comment\`,
                 TABLE_SCHEMA
             from INFORMATION_SCHEMA.TABLES
-            where TABLE_SCHEMA = ?
-        `, [database], true);
+            where TABLE_SCHEMA = ?`,
+            [database], true);
 
         return tables;
     }
@@ -84,6 +113,18 @@ class MysqlDriver extends Driver {
         return columns;
     }
 
+    async createDatabase(form) {
+        const sql = `CREATE SCHEMA \`${form.name}\` DEFAULT CHARACTER SET ${form.characterSet} COLLATE ${form.collation}`;
+
+        await this.query(sql, []);
+
+        return {
+            database: form.name,
+            default_character_set: form.characterSet,
+            default_collation: form.collation
+        };
+    }
+
     async getConnection() {
         if(! this.connected) {
             await this.connect();
@@ -97,7 +138,7 @@ class MysqlDriver extends Driver {
             return this;
         }
 
-        await this.query('USE '+ database, [], true);
+        await this.query('USE `'+ database + '`', [], true);
         this.using = database;
 
         return this;
@@ -108,16 +149,21 @@ class MysqlDriver extends Driver {
     }
 
     async query(sql, values = [], single = false) {
-        let start = moment();
+        let start = moment(),
+            sqlToParser = sql;
 
         if(sql instanceof QueryBuilder) {
-            let grammar = new MySqlGrammar;
-            sql = grammar.compileSelect(sql);
-            values = grammar.values;
+            sqlToParser = sql.knex.toString();
+            let builderRes = sql.knex.toSQL().toNative();
+            sql = builderRes.sql;
+            values = builderRes.bindings;
+
+
+
             single = true;
         }
 
-        let statements = SQLParser.parse(sql, 'mysql', ';'),
+        let statements = SQLParser.parse(sqlToParser, 'mysql', ';'),
             connection = await this.getConnection(),
             sets = [],
             statement,

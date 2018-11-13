@@ -8,15 +8,24 @@
                            filterable
                            default-first-option
                            size="small"
+                           ref="databaseSelect"
                            @change="handelDatabaseChange"
                            :disabled="! isActive"
                            placeholder="Choose Database...">
                     <template v-if="databases">
-                        <el-option v-for="db in databases.all()"
-                                   :key="db.name"
-                                   :label="db.name"
-                                   :value="db.name">
-                        </el-option>
+                        <el-option-group>
+                            <el-option value="__spql_create_new_database">
+                                <i class="el-icon-circle-plus"></i>
+                                <span>New Database</span>
+                            </el-option>
+                        </el-option-group>
+                        <el-option-group>
+                            <el-option v-for="db in databases.all()"
+                                       :key="db.name"
+                                       :label="db.name"
+                                       :value="db.name">
+                            </el-option>
+                        </el-option-group>
                     </template>
 
                 </el-select>
@@ -82,7 +91,8 @@
 
         data() {
             return {
-                database: null
+                database: null,
+                lastDatabase: null
             }
         },
 
@@ -95,6 +105,7 @@
                         return;
                     }
 
+                    this.lastDatabase = connection.selectedDatabase.name;
                     this.database = connection.selectedDatabase.name;
                 },
                 immediate: true
@@ -107,7 +118,15 @@
                     return;
                 }
 
+                if(this.database === '__spql_create_new_database') {
+                    this.database = this.lastDatabase;
+                    this.tab.setDynamicModal('SpqlCreateDatabase');
+
+                    return;
+                }
+
                 this.connection.select(this.database);
+                this.lastDatabase = this.database;
             }
         },
 

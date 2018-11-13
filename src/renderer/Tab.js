@@ -1,8 +1,8 @@
-import uuid from 'uuid/v4';
 import Service from "./Service";
 import Connection from './Connection';
 import {TAB_CONNECTION, TAB_CONNECTION_FORM} from "../utils/constants";
 import Log from "./Log";
+import Vue from 'vue';
 
 export default class Tab {
 
@@ -20,6 +20,7 @@ export default class Tab {
         this.type = TAB_CONNECTION_FORM;
         this.lastRoute = null;
         this.log = new Log();
+        this.dynamicModalName = null;
 
         this.nameDuplication = 0;
         this.connectionForm = Tab.createConnectionForm();
@@ -27,6 +28,10 @@ export default class Tab {
         if(this.connection) {
             this.connection.setTab(this);
         }
+    }
+
+    setDynamicModal(name) {
+        Vue.set(this, 'dynamicModalName', name);
     }
 
     setData(data) {
