@@ -94,6 +94,17 @@ export default class Row {
         }
     }
 
+    toGrid() {
+        let row = {},
+            cellIndex;
+
+        for(cellIndex = 0; cellIndex < this.cells.length; cellIndex++) {
+            row[this.cells[cellIndex].column.key] = this.cells[cellIndex].displayValue;
+        }
+
+        return row;
+    }
+
     static displayCell(column, cell) {
         if(column.is_binary && column.is_blob) {
             if(cell instanceof Uint8Array) {

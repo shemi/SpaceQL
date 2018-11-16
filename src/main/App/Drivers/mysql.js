@@ -158,8 +158,6 @@ class MysqlDriver extends Driver {
             sql = builderRes.sql;
             values = builderRes.bindings;
 
-
-
             single = true;
         }
 

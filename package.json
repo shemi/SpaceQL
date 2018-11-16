@@ -25,6 +25,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "buffer-image-size": "^0.6.4",
+    "canvas-datagrid": "^0.22.3",
     "codemirror": "^5.41.0",
     "cryptr": "^4.0.0",
     "element-ui": "^2.4.7",

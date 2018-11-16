@@ -28,15 +28,18 @@
                                  :key="'' + set.index"
                                  :name="'' + set.index">
 
-                        <data-table :columns="set.columns.all()"
-                                    :chunks-id="set.chunksId"
-                                    :total="set.total"
-                                    ref="dataTables"
-                                    @scroll="handleScroll($event, set)"
-                                    @load-next="handelLoadMore(set)"
-                                    :scroll-pos="getSetScrollPos(set)"
-                                    :content="set.rows.all()">
-                        </data-table>
+                        <spql-canvas-data-grid :content="set.rows.all()">
+                        </spql-canvas-data-grid>
+
+                        <!--<data-table :columns="set.columns.all()"-->
+                                    <!--:chunks-id="set.chunksId"-->
+                                    <!--:total="set.total"-->
+                                    <!--ref="dataTables"-->
+                                    <!--@scroll="handleScroll($event, set)"-->
+                                    <!--@load-next="handelLoadMore(set)"-->
+                                    <!--:scroll-pos="getSetScrollPos(set)"-->
+                                    <!--:content="set.rows.all()">-->
+                        <!--</data-table>-->
 
                     </el-tab-pane>
 
@@ -56,6 +59,7 @@
     import CodeMirror from "./CodeMirror/CodeMirror";
     import debounce from 'lodash/debounce';
     import GeneralComputedMixin from '../mixins/GeneralComputedMixin';
+    import SpqlCanvasDataGrid from "./CanvasDataGrid/CanvasDataGrid";
 
     export default {
 
@@ -192,6 +196,7 @@
         },
 
         components: {
+            SpqlCanvasDataGrid,
             MainFooter,
             DataTable,
             CodeMirror
