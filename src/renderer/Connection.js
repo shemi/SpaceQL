@@ -28,6 +28,7 @@ export default class Connection {
         this.log = [];
         this.version = version.version;
         this.fullVersion = version.fullVersion;
+        this.tableStorageEngines = [];
 
     }
 
@@ -104,6 +105,20 @@ export default class Connection {
         }
 
         return this.tab.id;
+    }
+
+    async getStorageEngines() {
+        if(this.tableStorageEngines.length > 0) {
+            return this.tableStorageEngines;
+        }
+
+        let engines = await Service.sendTo(this.tabId, 'ConnectionController@getStorageEngines');
+        this.tableStorageEngines = [];
+        for(let engine of engines) {
+            this.tableStorageEngines.push(engine);
+        }
+
+        return this.tableStorageEngines;
     }
 
     static async connect(connectionForm, tab) {

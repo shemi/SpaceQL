@@ -8,7 +8,8 @@ class ConnectionController extends Controller {
             'test',
             'connect',
             'disconnect',
-            'createDatabase'
+            'createDatabase',
+            'getStorageEngines'
         ];
     }
 
@@ -49,6 +50,10 @@ class ConnectionController extends Controller {
 
     async createDatabase(form) {
         return this.connection.createDatabase(form);
+    }
+
+    async getStorageEngines() {
+        return await this.connection.getStorageEngines();
     }
 
     transformConnectionForm(form) {

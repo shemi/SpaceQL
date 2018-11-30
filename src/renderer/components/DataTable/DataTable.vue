@@ -150,13 +150,12 @@
             },
 
             handelOrder(order) {
-                console.log('datatable order', order);
                 this.$emit('order', order);
             },
 
             updateList() {
                 this.remainRows = Math.floor(this.$refs.contentEl.clientHeight / this.rowSize);
-                this.rowsBench = this.remainRows * 4;
+                this.rowsBench = this.remainRows * 12;
                 this.randomId = uuid();
 
                 this.$nextTick(() => {

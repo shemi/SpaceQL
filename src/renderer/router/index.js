@@ -68,6 +68,13 @@ const router = new Router({
                     components: {
                         default: require('@/components/TableContent').default,
                     }
+                },
+                {
+                    path: 'structure',
+                    meta: {supportNewTable: true},
+                    components: {
+                        default: require('@/components/TableStructure').default,
+                    }
                 }
             ]
         },

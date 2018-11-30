@@ -144,6 +144,26 @@ class MysqlDriver extends Driver {
         return this;
     }
 
+    async getEngines() {
+        let engines = [],
+            engine,
+            {rows: rawEngines} = await this.query(
+                `SELECT ENGINE as \`name\`, SUPPORT as \`support\`, COMMENT as \`comment\` FROM INFORMATION_SCHEMA.ENGINES`,
+                [],
+                true
+            );
+
+        for(engine of rawEngines) {
+            engines.push({
+                is_default: engine.support === 'DEFAULT',
+                is_disabled: ['NO', 'DISABLED'].indexOf(engine.support) >= 0,
+                ...engine
+            })
+        }
+
+        return engines;
+    }
+
     builder() {
         return new QueryBuilder(this);
     }

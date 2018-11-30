@@ -22,6 +22,21 @@
             </div>
         </div>
 
+        <div class="tables-list-container new-tables">
+            <div class="aside-list">
+                <div v-for="item in newTables"
+                     :key="item.name" class="aside-list-item">
+                    <a @click="selectTable(item, true)"
+                       :class="{'is-active': table && item.name === table.name}"
+                       class="aside-item">
+                        <el-badge is-dot class="item">
+                            <span>{{ item.name }}</span>
+                        </el-badge>
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <div class="tables-list-container">
             <el-scrollbar ref="scrollbar"
                           view-class="aside-list"
@@ -33,7 +48,9 @@
                     <a @click="selectTable(item)"
                        :class="{'is-active': table && item.name === table.name}"
                        class="aside-item">
-                        <span>{{ item.name }}</span>
+                        <el-badge is-dot type="info" :hidden="! item.changed">
+                            <span>{{ item.name }}</span>
+                        </el-badge>
                     </a>
                 </div>
 
@@ -90,12 +107,12 @@
                 });
             },
 
-            selectTable(table) {
+            selectTable(table, fromNew = false) {
                 if(! this.database) {
                     return;
                 }
 
-                this.database.selectTable(table);
+                this.database.selectTable(table, fromNew);
             },
 
             refreshTables() {
@@ -117,6 +134,14 @@
 
             searchActive() {
                 return this.showSearch || !! this.search;
+            },
+
+            newTables() {
+                return this.database.newTables.all();
+            },
+
+            hasNewTables() {
+                return this.newTables.length > 0;
             },
 
             filteredTables() {
@@ -176,7 +201,7 @@
             }
         }
 
-        .tables-list-container {
+        .tables-list-container:not(.new-tables) {
             height: 100%;
             overflow: hidden;
             flex-shrink: 1;

@@ -2,6 +2,8 @@ import TablesCollection from "./TablesCollection";
 import Service from "./Service";
 import Query from "./Query";
 import Vue from "vue";
+import Table from "./Table";
+import find from 'lodash/find';
 
 export default class Database {
 
@@ -14,6 +16,7 @@ export default class Database {
 
         this.name = name;
         this.tables = new TablesCollection(tables || [], this);
+        this.newTables = new TablesCollection([], this);
         this.tablesLoaded = this.tables.isNotEmpty();
         this.selectedTable = null;
         this.default_character_set = default_character_set;
@@ -40,13 +43,17 @@ export default class Database {
         this.selectTable(this.tables.first());
     }
 
-    getTable(name) {
+    getTable(name, fromNew = false) {
+        if(fromNew) {
+            return this.newTables.first({name});
+        }
+
         return this.tables.first({name});
     }
 
-    selectTable(table) {
+    selectTable(table, fromNew = false) {
         if(typeof table === 'string') {
-            table = this.getTable(table);
+            table = this.getTable(table, fromNew);
         }
 
         if(this.selectedTable) {
@@ -97,21 +104,16 @@ export default class Database {
     }
 
     async createTable(form) {
-        try {
-            const res = await Service.sendTo(this.tabId, 'DatabaseController@createTable', this.name, form);
+        const engines = await this.connection.getStorageEngines();
 
-            this.tab.log.info(res.head);
+        const table = Table.create({
+            name: form.name,
+            engine: find(engines, {is_default: true}).name,
+            collation: this.default_collation
+        }, this);
 
-        } catch (e) {
-            this.tab.log.error(e);
-
-            throw e;
-        }
-
-        this.loadTables(true)
-            .catch(err => {
-
-            });
+        this.newTables.push(table);
+        this.selectTable(table);
 
         return this;
     }
@@ -120,6 +122,12 @@ export default class Database {
         this.tables.each(table => {
             table.resetScroll();
         });
+    }
+
+    get storageEngines() {
+        this.connection.getStorageEngines();
+
+        return this.connection.tableStorageEngines;
     }
 
     get toAutocomplete() {

@@ -82,6 +82,8 @@
         flex-grow: 0;
         flex-shrink: 0;
         height: 32px;
+        width: 100%;
+        box-sizing: border-box;
 
         .sp-main-footer-controls {
             display: flex;

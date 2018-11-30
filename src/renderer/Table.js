@@ -3,10 +3,12 @@ import Service from "./Service";
 import Stateable from "./Stateable";
 import ColumnsCollection from "./ColumnsCollection";
 import RowCollection from "./RowCollection";
+import Vue from "vue";
+import TableStructure from "./TableStructure";
 
 export default class Table extends Stateable {
 
-    constructor(data, database) {
+    constructor(data, database, isNew = false) {
         super();
 
         let { name, type,
@@ -14,6 +16,8 @@ export default class Table extends Stateable {
             created_at, collation,
             comment, columns
         } = data;
+
+        this._isNew = isNew;
 
         this.database = database;
 
@@ -23,14 +27,14 @@ export default class Table extends Stateable {
         this.format = format;
         this.created_at = created_at;
         this.collation = collation;
-        this.comment = comment;
+        this.comment = comment || '';
 
-        this.columns = new ColumnsCollection(columns, {
+        this.columns = new ColumnsCollection(columns || [], {
             name: this.name,
             database: this.database.name
         });
 
-        this.tableColumns = new ColumnsCollection(columns, {
+        this.tableColumns = new ColumnsCollection(columns || [], {
             name: this.name,
             database: this.database.name
         });
@@ -44,6 +48,8 @@ export default class Table extends Stateable {
         this.lastQuery = null;
         this.contentChanged = false;
         this.structureChanged = false;
+
+        this.buildStructureForm();
 
         Service.on(this.tabId, `UpdateTable@${this.name}`, this.update.bind(this));
     }
@@ -83,6 +89,7 @@ export default class Table extends Stateable {
             this.columns.collect(columns);
         }
 
+        this.structure.update(this.getStructureObject());
     }
 
     async getContent(refresh = false) {
@@ -90,6 +97,10 @@ export default class Table extends Stateable {
             order = this.getState('order'),
             limit = this.getState('limit'),
             tokenizeParams = JSON.stringify([query, order, limit]);
+
+        if(this._isNew) {
+            return this;
+        }
 
         refresh = refresh || this.contentChanged;
 
@@ -150,11 +161,34 @@ export default class Table extends Stateable {
         this.setState('scrollTop', 0);
     }
 
+    getStructureObject() {
+        return {
+            name: this.name || '',
+            database: this.database.name,
+            type: this.type || '',
+            engine: this.engine || '',
+            format: this.format || '',
+            collation: this.collation || '',
+            comment: this.comment || '',
+            columns: this.columns.export(),
+            indexes: [],
+            options: {}
+        };
+    }
+
+    buildStructureForm() {
+        this.structure = new TableStructure(this.getStructureObject());
+    }
+
     get toAutocomplete() {
         return {
             text: this.name,
             columns: this.columns.pluck('name')
         }
+    }
+
+    get changed() {
+        return this._isNew || this.structure.changed;
     }
 
     get tab() {
@@ -165,6 +199,10 @@ export default class Table extends Stateable {
         return this.database.tabId;
     }
 
+    get isNew() {
+        return this._isNew;
+    }
+
     static createState() {
         return {
             queryForm: {
@@ -172,11 +210,23 @@ export default class Table extends Stateable {
                 operator: '=',
                 value: null
             },
+            structureForm: {
+                name: '',
+                nameChanged: false,
+                columns: [],
+                indexes: [],
+                foreignKeys: [],
+            },
+            structureTab: 'columns',
             order: {},
             limit: 100,
             scrollTop: 0,
             scrollLeft: 0,
         }
+    }
+
+    static create(data, database) {
+        return new Table(data, database, true);
     }
 
 }

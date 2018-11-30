@@ -5,6 +5,7 @@
         <el-form ref="form" :model="form" @submit.native.prevent="createTable">
             <el-form-item required="">
                 <el-input v-model="form.name"
+                          @input="validateValue"
                           ref="firstInput"
                           autofocus
                           placeholder="Name"></el-input>
@@ -14,7 +15,7 @@
                 <el-button type="primary" native-type="submit"
                            size="mini"
                            :loading="loading"
-                           :disabled="! form.name">
+                           :disabled="! valid">
                     Create
                 </el-button>
             </el-form-item>
@@ -36,6 +37,7 @@
         data() {
             return {
                 loading: false,
+                valid: false,
                 form: {
                     name: ''
                 }
@@ -52,6 +54,12 @@
             });
         },
 
+        watch: {
+            database() {
+                this.validateValue();
+            }
+        },
+
         methods: {
             createTable() {
                 if(! this.form.name || ! this.database) {
@@ -63,10 +71,34 @@
                 this.database.createTable(this.form)
                     .then(res => {
                         this.loading = false;
+                        this.$router.replace(`/${this.tabId}/connection/structure`);
+                        this.close();
                     })
                     .catch(err => {
                         this.loading = false;
                     });
+            },
+
+            validateValue() {
+                if(! this.database) {
+                    this.valid = false;
+
+                    return;
+                }
+
+                if(! this.form.name) {
+                    this.valid = false;
+
+                    return;
+                }
+
+                if(this.database.getTable(this.form.name)) {
+                    this.valid = false;
+
+                    return;
+                }
+
+                this.valid = true;
             },
 
             close() {

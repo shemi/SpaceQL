@@ -13,4 +13,14 @@ export default class ColumnsCollection extends Collection {
         return this;
     }
 
+    export() {
+        let newItems = [];
+
+        for (let item of this.items) {
+            newItems.push(item.export());
+        }
+
+        return newItems;
+    }
+
 }
