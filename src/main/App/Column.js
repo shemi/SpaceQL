@@ -42,7 +42,6 @@ export default class Column {
             this.is_unsigned = !! (this.flags & FLAGS.UNSIGNED);
             this.is_binary = !! (this.flags & FLAGS.BINARY);
             this.is_auto_increment = !! (this.flags & FLAGS.AUTO_INCREMENT);
-
         }
     }
 

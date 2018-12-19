@@ -90,27 +90,46 @@ class MysqlDriver extends Driver {
         return tables;
     }
 
-    async getColumns(database, table) {
-        let {rows: columns} = await this.query(`
-            SELECT 
-                COLUMN_NAME as \`name\`,
-                ORDINAL_POSITION as \`position\`,
-                COLUMN_DEFAULT as \`default_value\`,
-                IS_NULLABLE as \`is_nullable\`,
-                DATA_TYPE as \`data_type\`,
-                CHARACTER_MAXIMUM_LENGTH as \`character_maximum_length\`,
-                CHARACTER_SET_NAME as \`character_set\`,
-                COLLATION_NAME as \`collation\`,
-                COLUMN_KEY as \`column_key\`,
-                PRIVILEGES as \`privileges\`,
-                COLUMN_COMMENT as \`comment\`
-            FROM INFORMATION_SCHEMA.COLUMNS 
-                WHERE TABLE_SCHEMA = ? 
-                AND TABLE_NAME = ?
-            ORDER BY position
-	    `, [database, table], true);
+    extractType(type) {
+        let matches = /([a-zA-Z]+)\(?([0-9]+)?\)?\s?(.+)?/g.exec(type);
 
-        return columns;
+        return {
+            type: matches[1],
+            length: matches[2] ? parseInt(matches[2]) : null,
+            flags: (matches[3] || '').trim().split(' ')
+        }
+    }
+
+    async getColumns(database, table) {
+        let column,
+            newColumns = [],
+            typeParts;
+
+        let {rows: columns} = await this.query(`
+        SHOW FULL COLUMNS 
+        FROM ${table}
+        FROM ${database}
+        `, [], true);
+
+        for(column of columns) {
+            typeParts = this.extractType(column.Type);
+
+            newColumns.push({
+                field: column.Field,
+                type: typeParts.type,
+                length: typeParts.length,
+                unsigned: typeParts.flags.includes('unsigned'),
+                zerofill: typeParts.flags.includes('zerofill'),
+                nullable: column.Null === 'YES',
+                key: column.Key,
+                default_value: column.Default,
+                extra: column.Extra,
+                collation: column.Collation,
+                comment: column.Comment
+            });
+        }
+
+        return newColumns;
     }
 
     async createDatabase(form) {
