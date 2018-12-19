@@ -1,7 +1,7 @@
 {
   "name": "SpaceQL",
   "productName": "SpaceQL",
-  "version": "0.0.2-alpha.1",
+  "version": "0.0.2-alpha.2",
   "author": "shemi perez <shemi.perez@gmail.com>",
   "description": "Fast open source database management application",
   "license": "(ISC OR GPL-3.0)",
