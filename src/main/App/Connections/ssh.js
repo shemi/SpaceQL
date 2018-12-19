@@ -1,5 +1,6 @@
 import Connection from "./Connection";
 import { Client } from 'ssh2';
+import fs from 'fs';
 
 class SshConnection extends Connection {
 
@@ -11,6 +12,19 @@ class SshConnection extends Connection {
 
     connectSshPipe() {
         let dbConfig = this._addDbDefaults(this.dbConfig);
+
+        if(this.config.key) {
+            try {
+                fs.accessSync(this.config.key, fs.constants.R_OK)
+            } catch (e) {
+                throw new Error(`The SSH Key File not found, path: "${this.config.key}"`);
+            }
+
+            this.config.privateKey = fs.readFileSync(this.config.key);
+
+            console.log(this.config.privateKey);
+
+        }
 
         return new Promise((resolve, reject) => {
             this.connection = new Client();
