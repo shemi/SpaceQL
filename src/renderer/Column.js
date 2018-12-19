@@ -29,6 +29,16 @@ export default class Column extends Stateable {
         return data;
     }
 
+    static createForStructure(name, label, type, defaultValue = 0) {
+        return new Column({
+            name, label,
+            default_value: defaultValue,
+            key: name,
+            type,
+            __spqlInternalId: 'columns-structure-' + name
+        }, {name: 'structure', database:'structure'})
+    }
+
     static createState() {
         return {
             width: 'auto'
