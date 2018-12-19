@@ -1,6 +1,6 @@
 <template>
 
-    <div class="data-table-row" tabindex="-1">
+    <div class="data-table-row">
         <div class="row-selector">
         </div>
 
@@ -9,9 +9,6 @@
                          :row-index="rowIndex"
                          :cell-index="index"
                          :cell-style="cellsStyle"
-                         :editable="editable"
-                         @click.native="focus($event, index)"
-                         @dblclick.native="edit($event, index)"
                          :cell="row.cells[index]">
         </data-table-cell>
 
@@ -35,8 +32,7 @@
             columns: Array,
             row: Object,
             cellsStyle: Object,
-            rowIndex: Number,
-            editable: Boolean
+            rowIndex: Number
         },
 
         idState () {
@@ -46,16 +42,6 @@
         },
 
         methods: {
-
-            edit($e, index) {
-                this.row.editCell(index);
-                this.$emit('enter-edit-mode', index);
-            },
-
-            focus($e, index) {
-                this.row.focusCell(index);
-                this.$emit('is-focused', index);
-            }
 
         },
 

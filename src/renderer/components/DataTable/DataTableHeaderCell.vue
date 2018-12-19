@@ -4,7 +4,7 @@
          :style="cellStyle"
          class="data-table-cell data-table-header-cell">
 
-        <div class="cell-content">{{ column.label || column.name }}</div>
+        <div class="cell-content">{{ column.name }}</div>
 
         <span class="caret-wrapper" v-if="isSortable">
             <span class="caret-holder" :class="caretClass">

@@ -16,7 +16,6 @@
 
                 <div class="data-table-content"
                      :style="contentStyle"
-                     tabindex="0"
                      ref="contentEl">
 
                         <recycle-scroller
@@ -29,13 +28,10 @@
                                 :buffer="rowsBench">
 
                             <data-table-row
-                                slot-scope="{item, index}"
+                                slot-scope="{item}"
                                 :row="item"
                                 :table-id="randomId"
                                 :cells-style="cellsStyle"
-                                :editable="editable"
-                                @enter-edit-mode="chaneActiveRow($event, index)"
-                                @is-focused="chaneActiveRow($event, index)"
                                 :columns="columns">
                             </data-table-row>
 
@@ -51,7 +47,6 @@
 </template>
 
 <script>
-    import {on, off} from 'element-ui/src/utils/dom';
     import uuid from 'uuid/v4';
     import DataTableHeader from './DataTableHeader';
     import DataTableRow from './DataTableRow';
@@ -60,7 +55,6 @@
     import scrollbarWidth from 'element-ui/src/utils/scrollbar-width';
     import Scrollbar from './Scrollbar/main';
     import RecycleScroller from "vue-virtual-scroller/src/components/RecycleScroller";
-    import {getTargetScrollLocationX, getTargetScrollLocationY} from "./getTargetScrollLocation";
 
     const SCROLL_BOTTOM_OFFSET = 200;
 
@@ -84,7 +78,7 @@
             },
             scrollPos: {
                 type: Object,
-                default: () => ({top: 0, left: 0})
+                default:  {top: 0, left: 0}
             }
         },
 
@@ -100,15 +94,14 @@
                 cellsStyle: {},
                 rows: this.content,
                 scrollReady: false,
-                rowSize: 26,
+                rowSize: 24,
                 remainRows: 0,
                 contentStyle: {width: '100%'},
                 wrapStyle: {
                     width: `calc(100% + ${scrollbarWidth()}px)`,
                     height: `calc(100% + ${scrollbarWidth()}px)`
                 },
-                rowsBench: 0,
-                activeRowIndex: null
+                rowsBench: 0
             }
         },
 
@@ -122,26 +115,12 @@
 
         mounted() {
             this.updateList();
-
-            on(document, 'keydown', this.onKeypress);
         },
 
         methods: {
             handleResize: debounce(function() {
                 this.updateList();
             }, 150),
-
-            chaneActiveRow($e, index) {
-                if(this.activeRowIndex === index) {
-                    return;
-                }
-
-                if(this.activeRowIndex !== null && this.content[this.activeRowIndex]) {
-                    this.content[this.activeRowIndex].deactivate();
-                }
-
-                this.activeRowIndex = index;
-            },
 
             handleScroll(e) {
                 let scrollTop,
@@ -168,87 +147,6 @@
                     top: this.heightElement.scrollTop,
                     left: this.widthElement.scrollLeft,
                 });
-            },
-
-            onKeypress($event) {
-                let key = $event.key,
-                    rowIndex = this.activeRowIndex || 0,
-                    nextRow,
-                    activeCell = 0;
-
-                if($event.shiftKey) {
-                    key = 'Shift' + key;
-                }
-
-                if($event.ctrlKey) {
-                    key = 'Ctrl' + key;
-                }
-
-                switch (key) {
-                    case 'ArrowUp':
-                        nextRow = (rowIndex === null ? this.content.length : rowIndex) - 1;
-                        activeCell = 0;
-
-                        if(nextRow < 0) {
-                            nextRow = this.content.length - 1;
-                            this.heightComponent.scrollToItem(nextRow);
-                        }
-
-                        if(this.content[rowIndex || 0]) {
-                            activeCell = this.content[rowIndex].activeCellIndex;
-                        }
-
-                        this.content[nextRow].focusCell(activeCell);
-                        this.chaneActiveRow($event, nextRow);
-
-                        break;
-                    case 'ArrowDown':
-                        nextRow = (rowIndex === null ? -1 : rowIndex) + 1;
-                        activeCell = 0;
-
-                        if(nextRow >= this.content.length) {
-                            nextRow = 0;
-                            this.heightComponent.scrollToItem(nextRow);
-                        }
-
-                        if(this.content[rowIndex || 0]) {
-                            activeCell = this.content[rowIndex].activeCellIndex;
-                        }
-
-                        this.content[nextRow].focusCell(activeCell);
-                        this.chaneActiveRow($event, nextRow);
-
-                        break;
-                    case 'ShiftTab':
-                    case 'ArrowLeft':
-                        if(! this.content[rowIndex]) {
-                            return;
-                        }
-
-                        this.content[rowIndex].prevCell();
-                        this.chaneActiveRow($event, rowIndex);
-
-                        break;
-                    case 'Tab':
-                    case 'ArrowRight':
-                        if(! this.content[rowIndex]) {
-                            return;
-                        }
-
-                        this.content[rowIndex].nextCell();
-                        this.chaneActiveRow($event, rowIndex);
-
-                        break;
-                    case 'Enter':
-
-                        break;
-                }
-
-                if(! ['input', 'select', 'textarea'].includes(document.activeElement.nodeName.toLowerCase())) {
-                    $event.stopPropagation();
-                    $event.preventDefault();
-                }
-
             },
 
             handelOrder(order) {
@@ -285,27 +183,6 @@
 
             resetCellsStyles() {
                 this.cellsStyle = {};
-            },
-
-            scrollCellIntoView(cell) {
-                if (!cell) {
-                    return;
-                }
-
-                let yTarget = getTargetScrollLocationY(cell, this.heightElement);
-                let xTarget = getTargetScrollLocationX(cell, this.widthElement);
-
-                if(yTarget.isOut) {
-                    this.heightComponent.scrollToPosition(yTarget.y);
-                }
-
-                if(xTarget.isOut) {
-                    this.widthElement.scrollLeft = xTarget.x;
-                }
-
-                if(this.$refs.scrollbar && (yTarget.isOut || xTarget.isOut)) {
-                    this.$refs.scrollbar.update();
-                }
             },
 
             updateCellWidth(cellIndex, width) {
@@ -363,14 +240,6 @@
             DataTableRow,
             VirtualList,
             Scrollbar
-        },
-
-        beforeDestroy() {
-            for(let row of this.content) {
-                row.deactivate();
-            }
-
-            off(document, 'keydown', this.onKeypress);
         }
 
     }

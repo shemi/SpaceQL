@@ -95,7 +95,7 @@
                  tab-position="top"
                  @tab-click="handleTabChanged">
             <el-tab-pane label="Columns" name="columns">
-                <table-columns-structure :table="form"></table-columns-structure>
+                COLUMNS
             </el-tab-pane>
 
             <el-tab-pane label="Indexes" name="indexes">
@@ -116,7 +116,6 @@
     import MainFooter from "./MainFooter";
     import GeneralComputedMixin from '../mixins/GeneralComputedMixin';
     import find from 'lodash/find';
-    import TableColumnsStructure from './TableColumnsStructure';
 
     export default {
 
@@ -208,7 +207,6 @@
         },
 
         components: {
-            TableColumnsStructure,
             MainFooter
         }
 
@@ -295,8 +293,6 @@
                 height: 100%;
                 flex-grow: 1;
                 flex-shrink: 0;
-                display: flex;
-                flex-direction: column;
             }
 
             .el-tabs__item {
@@ -309,15 +305,6 @@
                     border-left: none;
                 }
             }
-
-            .el-tab-pane {
-                height: 100%;
-                flex-grow: 1;
-                flex-shrink: 0;
-                display: flex;
-                flex-direction: column;
-            }
-
         }
 
     }

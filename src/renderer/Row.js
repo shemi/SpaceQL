@@ -18,9 +18,6 @@ class Cell {
         this.isBlob = false;
         this.isText = false;
 
-        this.inEditMode = false;
-        this.isFocused = false;
-
         this.init();
     }
 
@@ -59,27 +56,6 @@ class Cell {
 
     }
 
-    focus() {
-        this.isFocused = true;
-    }
-
-    unfocus() {
-        this.isFocused = false;
-    }
-
-    edit() {
-        this.inEditMode = true;
-    }
-
-    unedit() {
-        this.inEditMode = false;
-    }
-
-    deactivate() {
-        this.unedit();
-        this.unfocus();
-    }
-
     static truncateValue(value) {
         if( !value || typeof value !== 'string' ) {
             return '';
@@ -105,66 +81,7 @@ export default class Row {
         this.cells = [];
         this.__spqlInternalRowId = row.__spqlInternalRowId;
 
-        this.activeCellIndex = null;
-        this.isSelected = false;
-
         this.setCells(row);
-    }
-
-    prevCell(edit = false) {
-        let nextIndex = (this.activeCellIndex === null ? 1 : this.activeCellIndex) - 1;
-
-        if(! this.getCurrentCell() || nextIndex < 0) {
-            nextIndex = this.cells.length - 1;
-        }
-
-        edit ? this.editCell(nextIndex) : this.focusCell(nextIndex);
-    }
-
-    nextCell(edit = false) {
-        let nextIndex = (this.activeCellIndex === null ? -1 : this.activeCellIndex) + 1;
-
-        if(! this.getCurrentCell() || nextIndex >= this.cells.length) {
-            nextIndex = 0;
-        }
-
-        edit ? this.editCell(nextIndex) : this.focusCell(nextIndex);
-    }
-
-    focusCell(cellIndex) {
-        if(! this.cells[cellIndex]) {
-            throw new Error(`Cell with the index ${cellIndex} not found in row ${this.__spqlInternalRowId}`);
-        }
-
-        if(this.getCurrentCell()) {
-            this.getCurrentCell().unfocus();
-        }
-
-        this.cells[cellIndex].focus();
-        this.activeCellIndex = cellIndex;
-        this.isSelected = true;
-    }
-
-    editCell(cellIndex) {
-        if(! this.cells[cellIndex]) {
-            throw new Error(`Cell with the index ${cellIndex} not found in row ${this.__spqlInternalRowId}`);
-        }
-
-        if(this.getCurrentCell()) {
-            this.getCurrentCell().unedit();
-        }
-
-        this.focusCell(cellIndex);
-        this.getCurrentCell().edit();
-    }
-
-    deactivate() {
-        if(this.getCurrentCell()) {
-            this.getCurrentCell().deactivate();
-        }
-
-        this.activeCellIndex = null;
-        this.isSelected = false;
     }
 
     setCells(row) {
@@ -175,10 +92,6 @@ export default class Row {
                 new Cell(column, row[column.key], this.__spqlInternalRowId)
             )
         }
-    }
-
-    getCurrentCell() {
-        return this.activeCellIndex !== null ? this.cells[this.activeCellIndex] : null;
     }
 
     static displayCell(column, cell) {
